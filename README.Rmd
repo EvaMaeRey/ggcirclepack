@@ -1,0 +1,58 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# ggcirclepack
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of ggcirclepack is to ...
+
+## Installation
+
+You can install the development version of ggcirclepack from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("EvaMaeRey/ggcirclepack")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+library(ggcirclepack)
+library(ggplot2)
+library(magrittr)
+library(dplyr)
+
+gapminder::gapminder %>%
+filter(year == 2002) %>%
+  ggplot() +
+  aes(id = country) +
+  geom_polygon_circlepack(alpha = .5, size = .002)
+
+last_plot() +
+  aes(fill = continent)
+
+last_plot() +
+  aes(area = pop)
+
+last_plot() +
+  aes(color = continent) +
+  facet_wrap(facets = vars(continent))
+```
+
