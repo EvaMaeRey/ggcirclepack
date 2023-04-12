@@ -41,12 +41,8 @@ gapminder::gapminder %>%
 filter(year == 2002) %>%
   ggplot() +
   aes(id = country) +
-  geom_polygon_circlepack(alpha = .5, size = .002)
-#> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-#> ℹ Please use `linewidth` instead.
-#> This warning is displayed once every 8 hours.
-#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-#> generated.
+  geom_polygon_circlepack(alpha = .5) + 
+  coord_equal()
 #> Joining with `by = join_by(id)`
 ```
 
@@ -64,7 +60,8 @@ last_plot() +
 ``` r
 
 last_plot() +
-  aes(area = pop)
+  aes(area = pop) + 
+  geom_text_circlepack()
 #> Joining with `by = join_by(id)`
 ```
 
@@ -73,7 +70,6 @@ last_plot() +
 ``` r
 
 last_plot() +
-  aes(color = continent) +
   facet_wrap(facets = vars(continent))
 #> Joining with `by = join_by(id)`
 #> Joining with `by = join_by(id)`
@@ -83,3 +79,44 @@ last_plot() +
 ```
 
 <img src="man/figures/README-example-4.png" width="100%" />
+
+``` r
+
+
+last_plot() + 
+  scale_size_continuous(range = c(0, 4)) + 
+  theme(legend.position = "none")
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+```
+
+<img src="man/figures/README-example-5.png" width="100%" />
+
+``` r
+
+last_plot() + 
+  aes(area = gdpPercap*pop)
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+```
+
+<img src="man/figures/README-example-6.png" width="100%" />
+
+``` r
+
+last_plot() + 
+  aes(area = gdpPercap)
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+```
+
+<img src="man/figures/README-example-7.png" width="100%" />

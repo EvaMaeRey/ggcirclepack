@@ -43,16 +43,31 @@ gapminder::gapminder %>%
 filter(year == 2002) %>%
   ggplot() +
   aes(id = country) +
-  geom_polygon_circlepack(alpha = .5, size = .002)
+  geom_polygon_circlepack(alpha = .5) + 
+  coord_equal()
 
 last_plot() +
   aes(fill = continent)
 
 last_plot() +
-  aes(area = pop)
+  aes(area = pop) + 
+  geom_text_circlepack()
 
 last_plot() +
-  aes(color = continent) +
   facet_wrap(facets = vars(continent))
+
+
+last_plot() + 
+  scale_size_continuous(range = c(0, 4)) + 
+  theme(legend.position = "none")
+
+last_plot() + 
+  aes(area = gdpPercap*pop)
+
+last_plot() + 
+  aes(area = gdpPercap)
+
+
+
 ```
 
