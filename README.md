@@ -7,7 +7,8 @@
 
 <!-- badges: end -->
 
-Critical moment in my extension journey started with TLP.
+Critical moment in my extension journey started with TLP “extend your
+ability to extend”.
 
 Message 1: you can be an extender
 
@@ -32,17 +33,27 @@ Today I’ll present on ggcirclepack.
 Background: ggplot2 grammar guide walk through (reference from data to
 viz gallery)
 
+``` r
+knitr::include_url("https://evamaerey.github.io/ggplot2_grammar_guide/geoms_single_series.html#77")
+```
+
+<iframe src="https://evamaerey.github.io/ggplot2_grammar_guide/geoms_single_series.html#77" width="100%" height="400px" data-external="1">
+
+</iframe>
+
 –
 
 This didn’t feel like powerful ggplot2 experience
 
 –
 
-But what if it could?
+What would ggcirclepack look like?
 
 -----
 
-Here, the id of the circle isn’t defined by the center, but by it’s id…
+Here, the id of the circle isn’t defined by the center, x0y0, but by its
+id and area (an algorithm used under the hood to find x0y0 and x and y
+for perimeter)
 
 –
 
@@ -69,14 +80,6 @@ library(ggcirclepack)
 library(ggplot2)
 library(magrittr)
 library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 
 gapminder::gapminder %>%
 filter(year == 2002) %>%
@@ -102,7 +105,8 @@ last_plot() +
 ``` r
 
 last_plot() +
-  aes(area = pop)
+  aes(area = pop) + 
+  geom_text_circlepack()
 #> Joining with `by = join_by(id)`
 ```
 
@@ -111,8 +115,7 @@ last_plot() +
 ``` r
 
 last_plot() +
-  facet_wrap(facets = vars(continent)) + 
-  geom_text_circlepack()
+  facet_wrap(facets = vars(continent))
 #> Joining with `by = join_by(id)`
 #> Joining with `by = join_by(id)`
 #> Joining with `by = join_by(id)`
@@ -123,7 +126,6 @@ last_plot() +
 <img src="man/figures/README-example-4.png" width="100%" />
 
 ``` r
-
 
 last_plot() + 
   scale_size_continuous(range = c(0, 4)) + 
@@ -195,7 +197,7 @@ tidytitanic::tidy_titanic %>%
 
 -----
 
-Include other circlepacking algorithms.
+Other wish list item.. Include other circlepacking algorithms.
 
 –
 
@@ -219,4 +221,67 @@ aes(brain\_segment = ?)
 
 aes(tissue = ?)
 
-–
+-----
+
+# U.S. States
+
+  - inheriting from geom\_polygon
+  - ‘computing’ state xy perimeter based aes = my\_state\_var
+  - Ryan Miller tutorial start point.
+
+<!-- end list -->
+
+``` r
+knitr::include_url("https://evamaerey.github.io/mytidytuesday/2022-11-04-brain/brain.html")
+```
+
+<iframe src="https://evamaerey.github.io/mytidytuesday/2022-11-04-brain/brain.html" width="100%" height="400px" data-external="1">
+
+</iframe>
+
+-----
+
+``` r
+knitr::include_url("https://evamaerey.github.io/mytidytuesday/2023-03-06-us-states/us_states.html")
+```
+
+<iframe src="https://evamaerey.github.io/mytidytuesday/2023-03-06-us-states/us_states.html" width="100%" height="400px" data-external="1">
+
+</iframe>
+
+-----
+
+# U.S. counties
+
+  - inheriting from geom\_sf()
+  - ‘computing’ fips sf geometries column (xy perimeters) based on aes =
+    my\_fips\_code
+  - Wilke example start point
+
+<!-- end list -->
+
+``` r
+knitr::include_url("https://evamaerey.github.io/mytidytuesday/2023-03-10-ggfips/ggfips_w_sf.html")
+```
+
+<iframe src="https://evamaerey.github.io/mytidytuesday/2023-03-10-ggfips/ggfips_w_sf.html" width="100%" height="400px" data-external="1">
+
+</iframe>
+
+-----
+
+# Brain seg
+
+  - inheriting from geom\_sf()
+  - ‘computing’ tissue space based on aes = my\_seg\_name variable
+  - atlases from ggseg
+
+<!-- end list -->
+
+``` r
+knitr::include_url("https://evamaerey.github.io/mytidytuesday/2023-03-12-ggbrain-seg-sf/ggbrain_seg_sf.html")
+```
+
+<iframe src="https://evamaerey.github.io/mytidytuesday/2023-03-12-ggbrain-seg-sf/ggbrain_seg_sf.html" width="100%" height="400px" data-external="1">
+
+</iframe>

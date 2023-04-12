@@ -9,7 +9,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  cache = TRUE
 )
 ```
 
@@ -18,7 +19,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-Critical moment in my extension journey started with TLP.  
+Critical moment in my extension journey started with TLP "extend your ability to extend".  
 
 Message 1: you can be an extender 
 
@@ -43,6 +44,12 @@ Today I'll present on ggcirclepack.
 
 Background: ggplot2 grammar guide walk through (reference from data to viz gallery)
 
+```{r}
+knitr::include_url("https://evamaerey.github.io/ggplot2_grammar_guide/geoms_single_series.html#77")
+
+```
+
+
 --
 
 This didn't feel like powerful ggplot2 experience
@@ -50,12 +57,12 @@ This didn't feel like powerful ggplot2 experience
 
 --
 
-But what if it could?
+What would ggcirclepack look like? 
 
 ---
 
 
-Here, the id of the circle isn't defined by the center, but by it's id...
+Here, the id of the circle isn't defined by the center, x0y0, but by its id and area (an algorithm used under the hood to find x0y0 and x and y for perimeter)
 
 --
 
@@ -97,12 +104,11 @@ last_plot() +
   labs(title = "gapminder 2002 countries")
 
 last_plot() +
-  aes(area = pop)
-
-last_plot() +
-  facet_wrap(facets = vars(continent)) + 
+  aes(area = pop) + 
   geom_text_circlepack()
 
+last_plot() +
+  facet_wrap(facets = vars(continent))
 
 last_plot() + 
   scale_size_continuous(range = c(0, 4)) + 
@@ -146,7 +152,7 @@ tidytitanic::tidy_titanic() +
 
 ---
 
-Include other circlepacking algorithms.
+Other wish list item.. Include other circlepacking algorithms.
 
 --
 
@@ -171,5 +177,52 @@ aes(brain_segment = ?)
 aes(tissue = ?)
 
 
---
+---
+
+# U.S. States 
+
+- inheriting from geom_polygon
+- 'computing' state xy perimeter based aes = my_state_var
+- Ryan Miller tutorial start point.
+
+
+```{r}
+knitr::include_url("https://evamaerey.github.io/mytidytuesday/2022-11-04-brain/brain.html")
+```
+
+---
+
+
+```{r}
+knitr::include_url("https://evamaerey.github.io/mytidytuesday/2023-03-06-us-states/us_states.html")
+
+```
+
+
+---
+
+# U.S. counties
+
+- inheriting from geom_sf()
+- 'computing' fips sf geometries column (xy perimeters) based on aes = my_fips_code
+- Wilke example start point
+
+```{r}
+knitr::include_url("https://evamaerey.github.io/mytidytuesday/2023-03-10-ggfips/ggfips_w_sf.html")
+```
+
+
+
+
+---
+
+# Brain seg
+
+- inheriting from geom_sf() 
+- 'computing' tissue space based on aes = my_seg_name variable
+- atlases from ggseg
+
+```{r}
+knitr::include_url("https://evamaerey.github.io/mytidytuesday/2023-03-12-ggbrain-seg-sf/ggbrain_seg_sf.html")
+```
 
