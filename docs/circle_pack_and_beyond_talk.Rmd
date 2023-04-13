@@ -1,0 +1,326 @@
+---
+title: "ggcirclepack and beyond"
+author: "Dr. Evangeline Reynolds"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: [default, hygge, ninjutsu]
+    seal: false
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      seal: false
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  # fig.path = "man/figures/README-",
+  out.width = "100%",
+  cache = TRUE
+)
+```
+
+# ggcirclepack and beyond - highly experimental
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+---
+
+Critical moment in my extension journey started with TLP "extend your ability to extend".  
+--
+
+Message 1: you can be an extender 
+
+--
+
+Message 2: "where" aesthetics need not only be x and y.
+
+--
+
+aes(x0 = ?, y0 = ?)
+
+--
+
+And what ggplot2 actually looks at is computed for you (x and y)
+
+---
+
+
+Today I'll present on ggcirclepack. 
+
+---
+
+Background: ggplot2 grammar guide walk through (reference from data to viz gallery)
+
+https://evamaerey.github.io/ggplot2_grammar_guide/geoms_single_series.html#77
+
+---
+
+`r flipbookr::chunk_reveal("background")`
+
+```{r background, include=F}
+gapminder::gapminder %>%  
+  filter(continent == "Americas") %>%  
+  filter(year == 2002) %>%  
+  select(country, pop) ->  
+prep  
+
+packcircles::circleProgressiveLayout(prep$pop,  
+                                         sizetype = 'area') ->  
+pack  
+
+pack %>%  
+  packcircles::circleLayoutVertices(npoints = 50) ->  
+circle_outlines  
+
+circle_outlines %>%  
+  ggplot() +  
+  aes(x = x, y = y) +  
+  geom_polygon(colour = "black", alpha = 0.6) +  
+  aes(group = id) +  
+  aes(fill = factor(id)) +  
+  geom_text(data = cbind(prep, pack),  
+            aes(x, y, size = pop, label = country,  
+                group = NULL, fill = NULL)) +  
+  theme(legend.position = "none") +  
+  coord_equal()
+```
+
+
+---
+
+This didn't feel like powerful ggplot2 experience
+
+--
+
+packcircles + ggplot2
+
+--
+
+What would ggcirclepack look like? 
+
+---
+
+
+Here, the id of the circle isn't defined by the center, x0y0, but by its id and area (an algorithm used under the hood to find x0y0 and x and y for perimeter)
+
+--
+
+Working with compute_panel(), ggols
+
+
+---
+
+
+## Installation
+
+You can install the development version of ggcirclepack from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("EvaMaeRey/ggcirclepack")
+```
+
+## Example
+
+
+`r flipbookr::chunk_reveal("example")`
+
+```{r example, include = F}
+library(ggcirclepack)
+library(tidyverse)
+library(magrittr)
+library(dplyr)
+
+gapminder::gapminder %>%
+filter(year == 2002) %>%
+  ggplot() +
+  aes(id = country) +
+  labs(title = "142 gapminder countries in 2002") +
+  geom_polygon_circlepack(alpha = .5) + 
+  coord_equal() +
+  aes(fill = continent) + 
+  aes(area = pop) + 
+  geom_text_circlepack() +
+  scale_size_continuous(range = c(0, 4)) + 
+  facet_wrap(facets = vars(continent)) +
+  theme(legend.position = "none") + 
+  aes(area = gdpPercap*pop) + 
+  aes(area = gdpPercap)
+```
+
+
+
+---
+### Implementation: compute_panel_circle_pack
+
+```{r}
+readLines("../R/geom_circle_pack.R")[30:51]
+```
+
+
+---
+### Implementation: ggproto
+
+```{r}
+readLines("../R/geom_circle_pack.R")[55:62]
+```
+
+---
+### Implementation: geom_polygon_circlepack
+
+```{r}
+readLines("../R/geom_circle_pack.R")[97:110]
+```
+
+
+---
+
+Wish list for ggcirclepack:
+
+More computation under the hood for a count data case.  
+
+```{r}
+tidytitanic::tidy_titanic %>% 
+  head()
+```
+
+
+
+---
+
+`r flipbookr::chunk_reveal("titanic", display = "code")`
+
+```{r titanic, eval = F, echo = F}
+tidytitanic::tidy_titanic() + 
+  ggplot() + 
+  aes(x = "all") + 
+  geom_polygon_circlepack_count(alpha = .5) + 
+  geom_text_circlepack_count() + # automatically labels with count
+  aes(linetype = sex) + 
+  aes(color = age) + 
+  aes(alpha = survived) + 
+  facet_wrap(~class)
+```
+
+---
+
+Other wish list item
+
+
+--
+
+Include other circlepacking algorithms?
+
+--
+
+get feedback from {packcircles} author!  
+
+---
+
+# 'Circles are just the best'  TLP
+
+
+--
+
+# If you squint, a Texas and a Circle look like pretty much the same thing.
+
+
+
+
+---
+
+### Extremely highly experimental: maps and atlasses.
+
+
+
+
+--
+
+aes(where = ?)
+--
+aes(country = ?)
+
+aes(state = ?)
+
+aes(fips = ?) # us county codes
+
+aes(brain_segment = ?)
+
+aes(tissue = ?)
+
+
+---
+
+# U.S. States 
+
+- inheriting from geom_polygon
+- 'computing' state xy perimeter based aes = my_state_var
+- Ryan Miller tutorial start point.
+
+
+https://evamaerey.github.io/mytidytuesday/2022-11-04-brain/brain.html
+
+---
+
+
+https://evamaerey.github.io/mytidytuesday/2023-03-06-us-states/us_states.html
+
+
+
+
+---
+
+# U.S. counties
+
+- inheriting from geom_sf()
+- 'computing' fips sf geometries column (xy perimeters) based on aes = my_fips_code
+- Wilke example start point
+
+
+https://evamaerey.github.io/mytidytuesday/2023-03-10-ggfips/ggfips_w_sf.html
+
+
+
+
+---
+
+# Brain seg
+
+- inheriting from geom_sf() 
+- 'computing' tissue space based on aes = my_seg_name variable
+- atlases from ggseg
+
+
+https://evamaerey.github.io/mytidytuesday/2023-03-12-ggbrain-seg-sf/ggbrain_seg_sf.html
+
+
+
+
+
+---
+
+```{r, }
+library(gganatogram)
+
+a <- gganatogram(data=hgFemale_key, outline = T, fillOutline='#a6bddb', organism='human', sex='female', fill="colour") 
+
+a + 
+  ggstamp::stamp_wash() +
+  geom_path(data = hgFemale_list$brain, aes(x = x, y = -y), color = "red", size = .5, linetype = "dashed") +
+  coord_equal()
+
+
+hgFemale_list$liver %>% 
+  rename(organ = id) %>% 
+  left_join(hgFemale_key) ->
+liver_with_other_info
+```
+
+

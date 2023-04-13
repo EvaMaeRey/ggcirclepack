@@ -226,3 +226,102 @@ knitr::include_url("https://evamaerey.github.io/mytidytuesday/2023-03-10-ggfips/
 knitr::include_url("https://evamaerey.github.io/mytidytuesday/2023-03-12-ggbrain-seg-sf/ggbrain_seg_sf.html")
 ```
 
+
+
+
+
+---
+
+```{r}
+library(gganatogram)
+
+a <- gganatogram(data=hgFemale_key, outline = T, fillOutline='#a6bddb', organism='human', sex='female', fill="colour") 
+
+hgFemale_key$organ %>% length()
+
+
+a + 
+  ggstamp::stamp_wash() +
+  geom_path(data = hgFemale_list$brain, aes(x = x, y = -y), color = "red", size = .5, linetype = "dashed") +
+  coord_equal()
+
+
+hgFemale_list$liver %>% 
+  rename(organ = id) %>% 
+  left_join(hgFemale_key) ->
+liver_with_other_info
+```
+# chat gpt?  Confidently writes something... 
+
+write me a ggplot2 extension for circle packing:
+
+Sure, here's an example of a ggplot2 extension for circle packing:
+
+```{r, eval = F}
+# Load necessary packages
+library(ggplot2)
+library(grid)
+library(gridExtra)
+library(viridis)
+library(dplyr)
+
+# Define a function to create circle packing plot
+circle_packing_plot <- function(data, size, color = NULL, palette = viridis::viridis, alpha = 0.8, ...) {
+  
+  # Prepare data for plotting
+  data <- data %>%
+    arrange(desc(size)) %>%
+    mutate(id = row_number()) %>%
+    mutate(parent = ifelse(id == 1, NA, id - 1)) %>%
+    mutate(name = paste(id, "-", name)) %>%
+    select(id, parent, name, size, color)
+  
+  # Calculate layout of circles
+  layout <- packcircles(data$size)
+  
+  # Create a blank canvas to draw the plot
+  canvas <- ggplot(data.frame(x = c(-1, 1), y = c(-1, 1)), aes(x = x, y = y)) +
+    geom_blank() +
+    coord_fixed() +
+    theme_void() +
+    theme(plot.margin = unit(c(1,1,1,1), "cm"))
+  
+  # Create a circle for each data point
+  circles <- lapply(seq_len(nrow(data)), function(i) {
+    gg <- ggplot(data[i, ], aes(x = layout$circle.x[i], y = layout$circle.y[i])) +
+      geom_circle(aes(r = layout$radius[i], fill = color), alpha = alpha) +
+      ggtitle(data$name[i]) +
+      scale_fill_gradientn(colors = palette, na.value = "white") +
+      guides(fill = FALSE) +
+      theme_void()
+    gg
+  })
+  
+  # Combine the circles and the canvas into a single plot
+  plot <- grid.arrange(
+    grobs = circles,
+    ncol = 1,
+    widths = unit(1, "npc"),
+    heights = unit(layout$height, "npc")
+  )
+  
+  plot <- arrangeGrob(canvas, plot, nrow = 1, heights = c(0.15, 0.85))
+  
+  return(plot)
+}
+
+# Register the circle packing plot function as a ggplot2 extension
+ggplot2::ggplot2_register_extension("circle_packing", circle_packing_plot)
+
+
+# With this extension, you can create a circle packing plot by using the geom_circle_pack() function in ggplot2. Here's an example usage:
+
+data(mtcars)
+
+# Create circle packing plot
+ggplot(mtcars, aes(size = mpg, color = wt)) +
+  geom_circle_pack() +
+  labs(title = "Circle Packing Plot of Cars") +
+  scale_size_continuous(name = "Miles per Gallon") +
+  scale_color_continuous(name = "Weight")
+```
