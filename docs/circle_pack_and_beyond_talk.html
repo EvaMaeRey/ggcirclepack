@@ -15,38 +15,56 @@
 
 
 
-# ggcirclepack and beyond - highly experimental
+# ggcirclepack and beyond: experiments in the compute_panel space
 
 &lt;!-- badges: start --&gt;
 &lt;!-- badges: end --&gt;
 
----
-
-Critical moment in my extension journey started with TLP "extend your ability to extend".  
---
-
-Message 1: you can be an extender 
-
---
-
-Message 2: "where" aesthetics need not only be x and y.
-
---
-
-aes(x0 = ?, y0 = ?)
-
---
-
-And what ggplot2 actually looks at is computed for you (x and y)
-
----
 
 
-Today I'll present on ggcirclepack. 
+
+```
+#&gt; Joining with `by = join_by(id)`
+```
+
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/cars-1.png" width="100%" /&gt;
+
+```
+#&gt; NULL
+```
+
+
+
+
+
 
 ---
 
-Background: ggplot2 grammar guide walk through (reference from data to viz gallery)
+## Critical moment in my extension journey started with TLP "extend your ability to extend".  
+--
+
+## Message 1: you can be an extender 
+
+--
+
+## Message 2: "where" aesthetics need not only be x and y, in geom_circle() example
+
+--
+
+### - aes(x0 = ?, y0 = ?)
+
+--
+
+### - And what ggplot2 actually renders, it computes for you (x and y)
+
+---
+
+
+# Today I'll present on ggcirclepack. 
+
+---
+
+## Background: ggplot2 grammar guide walk through (reference from data to viz gallery)
 
 https://evamaerey.github.io/ggplot2_grammar_guide/geoms_single_series.html#77
 
@@ -213,8 +231,33 @@ gapminder::gapminder %&gt;%
   select(country, pop) -&gt;
 prep
 
-*packcircles::circleProgressiveLayout(prep$pop,
-*                                        sizetype = 'area')
+*library(packcircles)
+```
+]
+ 
+.panel2-background-auto[
+
+]
+
+---
+count: false
+ 
+
+.panel1-background-auto[
+
+```r
+gapminder::gapminder %&gt;%
+  filter(continent == "Americas") %&gt;%
+  filter(year == 2002) %&gt;%
+  select(country, pop) -&gt;
+prep
+
+library(packcircles)
+# center and radius
+*circleProgressiveLayout(
+* prep$pop,
+* sizetype = 'area'
+* )
 ```
 ]
  
@@ -263,8 +306,12 @@ gapminder::gapminder %&gt;%
   select(country, pop) -&gt;
 prep
 
-packcircles::circleProgressiveLayout(prep$pop,
-                                         sizetype = 'area') -&gt;
+library(packcircles)
+# center and radius
+circleProgressiveLayout(
+  prep$pop,
+  sizetype = 'area'
+  ) -&gt;
 *pack
 ```
 ]
@@ -286,10 +333,15 @@ gapminder::gapminder %&gt;%
   select(country, pop) -&gt;
 prep
 
-packcircles::circleProgressiveLayout(prep$pop,
-                                         sizetype = 'area') -&gt;
+library(packcircles)
+# center and radius
+circleProgressiveLayout(
+  prep$pop,
+  sizetype = 'area'
+  ) -&gt;
 pack
 
+# trace outlines
 *pack
 ```
 ]
@@ -339,12 +391,17 @@ gapminder::gapminder %&gt;%
   select(country, pop) -&gt;
 prep
 
-packcircles::circleProgressiveLayout(prep$pop,
-                                         sizetype = 'area') -&gt;
+library(packcircles)
+# center and radius
+circleProgressiveLayout(
+  prep$pop,
+  sizetype = 'area'
+  ) -&gt;
 pack
 
+# trace outlines
 pack %&gt;%
-* packcircles::circleLayoutVertices(npoints = 50)
+* circleLayoutVertices(npoints = 50)
 ```
 ]
  
@@ -1643,12 +1700,17 @@ gapminder::gapminder %&gt;%
   select(country, pop) -&gt;
 prep
 
-packcircles::circleProgressiveLayout(prep$pop,
-                                         sizetype = 'area') -&gt;
+library(packcircles)
+# center and radius
+circleProgressiveLayout(
+  prep$pop,
+  sizetype = 'area'
+  ) -&gt;
 pack
 
+# trace outlines
 pack %&gt;%
-  packcircles::circleLayoutVertices(npoints = 50) -&gt;
+  circleLayoutVertices(npoints = 50) -&gt;
 *circle_outlines
 ```
 ]
@@ -1670,12 +1732,17 @@ gapminder::gapminder %&gt;%
   select(country, pop) -&gt;
 prep
 
-packcircles::circleProgressiveLayout(prep$pop,
-                                         sizetype = 'area') -&gt;
+library(packcircles)
+# center and radius
+circleProgressiveLayout(
+  prep$pop,
+  sizetype = 'area'
+  ) -&gt;
 pack
 
+# trace outlines
 pack %&gt;%
-  packcircles::circleLayoutVertices(npoints = 50) -&gt;
+  circleLayoutVertices(npoints = 50) -&gt;
 circle_outlines
 
 *circle_outlines
@@ -2977,47 +3044,21 @@ gapminder::gapminder %&gt;%
   select(country, pop) -&gt;
 prep
 
-packcircles::circleProgressiveLayout(prep$pop,
-                                         sizetype = 'area') -&gt;
+library(packcircles)
+# center and radius
+circleProgressiveLayout(
+  prep$pop,
+  sizetype = 'area'
+  ) -&gt;
 pack
 
+# trace outlines
 pack %&gt;%
-  packcircles::circleLayoutVertices(npoints = 50) -&gt;
+  circleLayoutVertices(npoints = 50) -&gt;
 circle_outlines
 
 circle_outlines %&gt;%
 * ggplot()
-```
-]
- 
-.panel2-background-auto[
-&lt;img src="circle_pack_and_beyond_talk_files/figure-html/background_auto_12_output-1.png" width="100%" /&gt;
-]
-
----
-count: false
- 
-
-.panel1-background-auto[
-
-```r
-gapminder::gapminder %&gt;%
-  filter(continent == "Americas") %&gt;%
-  filter(year == 2002) %&gt;%
-  select(country, pop) -&gt;
-prep
-
-packcircles::circleProgressiveLayout(prep$pop,
-                                         sizetype = 'area') -&gt;
-pack
-
-pack %&gt;%
-  packcircles::circleLayoutVertices(npoints = 50) -&gt;
-circle_outlines
-
-circle_outlines %&gt;%
-  ggplot() +
-* aes(x = x, y = y)
 ```
 ]
  
@@ -3038,18 +3079,22 @@ gapminder::gapminder %&gt;%
   select(country, pop) -&gt;
 prep
 
-packcircles::circleProgressiveLayout(prep$pop,
-                                         sizetype = 'area') -&gt;
+library(packcircles)
+# center and radius
+circleProgressiveLayout(
+  prep$pop,
+  sizetype = 'area'
+  ) -&gt;
 pack
 
+# trace outlines
 pack %&gt;%
-  packcircles::circleLayoutVertices(npoints = 50) -&gt;
+  circleLayoutVertices(npoints = 50) -&gt;
 circle_outlines
 
 circle_outlines %&gt;%
   ggplot() +
-  aes(x = x, y = y) +
-* geom_polygon(colour = "black", alpha = 0.6)
+* aes(x = x, y = y)
 ```
 ]
  
@@ -3070,19 +3115,23 @@ gapminder::gapminder %&gt;%
   select(country, pop) -&gt;
 prep
 
-packcircles::circleProgressiveLayout(prep$pop,
-                                         sizetype = 'area') -&gt;
+library(packcircles)
+# center and radius
+circleProgressiveLayout(
+  prep$pop,
+  sizetype = 'area'
+  ) -&gt;
 pack
 
+# trace outlines
 pack %&gt;%
-  packcircles::circleLayoutVertices(npoints = 50) -&gt;
+  circleLayoutVertices(npoints = 50) -&gt;
 circle_outlines
 
 circle_outlines %&gt;%
   ggplot() +
   aes(x = x, y = y) +
-  geom_polygon(colour = "black", alpha = 0.6) +
-* aes(group = id)
+* geom_polygon()
 ```
 ]
  
@@ -3103,20 +3152,24 @@ gapminder::gapminder %&gt;%
   select(country, pop) -&gt;
 prep
 
-packcircles::circleProgressiveLayout(prep$pop,
-                                         sizetype = 'area') -&gt;
+library(packcircles)
+# center and radius
+circleProgressiveLayout(
+  prep$pop,
+  sizetype = 'area'
+  ) -&gt;
 pack
 
+# trace outlines
 pack %&gt;%
-  packcircles::circleLayoutVertices(npoints = 50) -&gt;
+  circleLayoutVertices(npoints = 50) -&gt;
 circle_outlines
 
 circle_outlines %&gt;%
   ggplot() +
   aes(x = x, y = y) +
-  geom_polygon(colour = "black", alpha = 0.6) +
-  aes(group = id) +
-* aes(fill = factor(id))
+  geom_polygon() +
+* aes(group = id)
 ```
 ]
  
@@ -3137,23 +3190,25 @@ gapminder::gapminder %&gt;%
   select(country, pop) -&gt;
 prep
 
-packcircles::circleProgressiveLayout(prep$pop,
-                                         sizetype = 'area') -&gt;
+library(packcircles)
+# center and radius
+circleProgressiveLayout(
+  prep$pop,
+  sizetype = 'area'
+  ) -&gt;
 pack
 
+# trace outlines
 pack %&gt;%
-  packcircles::circleLayoutVertices(npoints = 50) -&gt;
+  circleLayoutVertices(npoints = 50) -&gt;
 circle_outlines
 
 circle_outlines %&gt;%
   ggplot() +
   aes(x = x, y = y) +
-  geom_polygon(colour = "black", alpha = 0.6) +
+  geom_polygon() +
   aes(group = id) +
-  aes(fill = factor(id)) +
-* geom_text(data = cbind(prep, pack),
-*           aes(x, y, size = pop, label = country,
-*               group = NULL, fill = NULL))
+* aes(fill = factor(id))
 ```
 ]
  
@@ -3174,24 +3229,31 @@ gapminder::gapminder %&gt;%
   select(country, pop) -&gt;
 prep
 
-packcircles::circleProgressiveLayout(prep$pop,
-                                         sizetype = 'area') -&gt;
+library(packcircles)
+# center and radius
+circleProgressiveLayout(
+  prep$pop,
+  sizetype = 'area'
+  ) -&gt;
 pack
 
+# trace outlines
 pack %&gt;%
-  packcircles::circleLayoutVertices(npoints = 50) -&gt;
+  circleLayoutVertices(npoints = 50) -&gt;
 circle_outlines
 
 circle_outlines %&gt;%
   ggplot() +
   aes(x = x, y = y) +
-  geom_polygon(colour = "black", alpha = 0.6) +
+  geom_polygon() +
   aes(group = id) +
   aes(fill = factor(id)) +
-  geom_text(data = cbind(prep, pack),
-            aes(x, y, size = pop, label = country,
-                group = NULL, fill = NULL)) +
-* theme(legend.position = "none")
+* geom_text(data =
+*             cbind(prep, pack),
+*           aes(x, y, size = pop,
+*               label = country,
+*               group = NULL,
+*               fill = NULL))
 ```
 ]
  
@@ -3212,30 +3274,84 @@ gapminder::gapminder %&gt;%
   select(country, pop) -&gt;
 prep
 
-packcircles::circleProgressiveLayout(prep$pop,
-                                         sizetype = 'area') -&gt;
+library(packcircles)
+# center and radius
+circleProgressiveLayout(
+  prep$pop,
+  sizetype = 'area'
+  ) -&gt;
 pack
 
+# trace outlines
 pack %&gt;%
-  packcircles::circleLayoutVertices(npoints = 50) -&gt;
+  circleLayoutVertices(npoints = 50) -&gt;
 circle_outlines
 
 circle_outlines %&gt;%
   ggplot() +
   aes(x = x, y = y) +
-  geom_polygon(colour = "black", alpha = 0.6) +
+  geom_polygon() +
   aes(group = id) +
   aes(fill = factor(id)) +
-  geom_text(data = cbind(prep, pack),
-            aes(x, y, size = pop, label = country,
-                group = NULL, fill = NULL)) +
+  geom_text(data =
+              cbind(prep, pack),
+            aes(x, y, size = pop,
+                label = country,
+                group = NULL,
+                fill = NULL)) +
+* theme(legend.position = "none")
+```
+]
+ 
+.panel2-background-auto[
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/background_auto_19_output-1.png" width="100%" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-background-auto[
+
+```r
+gapminder::gapminder %&gt;%
+  filter(continent == "Americas") %&gt;%
+  filter(year == 2002) %&gt;%
+  select(country, pop) -&gt;
+prep
+
+library(packcircles)
+# center and radius
+circleProgressiveLayout(
+  prep$pop,
+  sizetype = 'area'
+  ) -&gt;
+pack
+
+# trace outlines
+pack %&gt;%
+  circleLayoutVertices(npoints = 50) -&gt;
+circle_outlines
+
+circle_outlines %&gt;%
+  ggplot() +
+  aes(x = x, y = y) +
+  geom_polygon() +
+  aes(group = id) +
+  aes(fill = factor(id)) +
+  geom_text(data =
+              cbind(prep, pack),
+            aes(x, y, size = pop,
+                label = country,
+                group = NULL,
+                fill = NULL)) +
   theme(legend.position = "none") +
 * coord_equal()
 ```
 ]
  
 .panel2-background-auto[
-&lt;img src="circle_pack_and_beyond_talk_files/figure-html/background_auto_19_output-1.png" width="100%" /&gt;
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/background_auto_20_output-1.png" width="100%" /&gt;
 ]
 
 &lt;style&gt;
@@ -3272,25 +3388,33 @@ circle_outlines %&gt;%
 
 ---
 
-This didn't feel like powerful ggplot2 experience
+## This didn't feel like powerful ggplot2 experience
 
 --
 
-packcircles + ggplot2
+## packcircles 
+--
++ ggplot2
 
 --
 
-What would ggcirclepack look like? 
+## What would integrated, ggcirclepack look like? 
 
 ---
 
-
-Here, the id of the circle isn't defined by the center, x0y0, but by its id and area (an algorithm used under the hood to find x0y0 and x and y for perimeter)
+### in a {ggpackcircles}, the answer 'where/which' of the circle isn't defined by the center, x0y0, but by its *id* and *area* (an algorithm used under the hood to find x0y0 and x and y for perimeter); 
 
 --
 
-Working with compute_panel(), ggols
+### and the id and areas of all of the other circles to be drawn
 
+--
+
+### the *exactly where* (x and y perimeter) gets computed in the background by packing algorithm and ggplot2
+
+--
+
+### Working with compute_panel(), in other project ggols
 
 ---
 
@@ -3304,8 +3428,7 @@ You can install the development version of ggcirclepack from [GitHub](https://gi
 devtools::install_github("EvaMaeRey/ggcirclepack")
 ```
 
-## Example
-
+---
 
 count: false
  
@@ -3482,7 +3605,7 @@ library(dplyr)
 gapminder::gapminder %&gt;%
 filter(year == 2002) %&gt;%
   ggplot() +
-* aes(id = country)
+* labs(title = "142 gapminder countries in 2002")
 ```
 ]
  
@@ -3505,8 +3628,8 @@ library(dplyr)
 gapminder::gapminder %&gt;%
 filter(year == 2002) %&gt;%
   ggplot() +
-  aes(id = country) +
-* labs(title = "142 gapminder countries in 2002")
+  labs(title = "142 gapminder countries in 2002") +
+* aes(id = country)   # req aes
 ```
 ]
  
@@ -3529,8 +3652,9 @@ library(dplyr)
 gapminder::gapminder %&gt;%
 filter(year == 2002) %&gt;%
   ggplot() +
-  aes(id = country) +
   labs(title = "142 gapminder countries in 2002") +
+  aes(id = country) +  # req aes
+# default area is 1
 * geom_polygon_circlepack(alpha = .5)
 ```
 ]
@@ -3559,8 +3683,9 @@ library(dplyr)
 gapminder::gapminder %&gt;%
 filter(year == 2002) %&gt;%
   ggplot() +
-  aes(id = country) +
   labs(title = "142 gapminder countries in 2002") +
+  aes(id = country) +  # req aes
+# default area is 1
   geom_polygon_circlepack(alpha = .5) +
 * coord_equal()
 ```
@@ -3590,8 +3715,9 @@ library(dplyr)
 gapminder::gapminder %&gt;%
 filter(year == 2002) %&gt;%
   ggplot() +
-  aes(id = country) +
   labs(title = "142 gapminder countries in 2002") +
+  aes(id = country) +  # req aes
+# default area is 1
   geom_polygon_circlepack(alpha = .5) +
   coord_equal() +
 * aes(fill = continent)
@@ -3622,8 +3748,9 @@ library(dplyr)
 gapminder::gapminder %&gt;%
 filter(year == 2002) %&gt;%
   ggplot() +
-  aes(id = country) +
   labs(title = "142 gapminder countries in 2002") +
+  aes(id = country) +  # req aes
+# default area is 1
   geom_polygon_circlepack(alpha = .5) +
   coord_equal() +
   aes(fill = continent) +
@@ -3655,8 +3782,9 @@ library(dplyr)
 gapminder::gapminder %&gt;%
 filter(year == 2002) %&gt;%
   ggplot() +
-  aes(id = country) +
   labs(title = "142 gapminder countries in 2002") +
+  aes(id = country) +  # req aes
+# default area is 1
   geom_polygon_circlepack(alpha = .5) +
   coord_equal() +
   aes(fill = continent) +
@@ -3689,8 +3817,9 @@ library(dplyr)
 gapminder::gapminder %&gt;%
 filter(year == 2002) %&gt;%
   ggplot() +
-  aes(id = country) +
   labs(title = "142 gapminder countries in 2002") +
+  aes(id = country) +  # req aes
+# default area is 1
   geom_polygon_circlepack(alpha = .5) +
   coord_equal() +
   aes(fill = continent) +
@@ -3724,8 +3853,9 @@ library(dplyr)
 gapminder::gapminder %&gt;%
 filter(year == 2002) %&gt;%
   ggplot() +
-  aes(id = country) +
   labs(title = "142 gapminder countries in 2002") +
+  aes(id = country) +  # req aes
+# default area is 1
   geom_polygon_circlepack(alpha = .5) +
   coord_equal() +
   aes(fill = continent) +
@@ -3764,8 +3894,9 @@ library(dplyr)
 gapminder::gapminder %&gt;%
 filter(year == 2002) %&gt;%
   ggplot() +
-  aes(id = country) +
   labs(title = "142 gapminder countries in 2002") +
+  aes(id = country) +  # req aes
+# default area is 1
   geom_polygon_circlepack(alpha = .5) +
   coord_equal() +
   aes(fill = continent) +
@@ -3805,8 +3936,9 @@ library(dplyr)
 gapminder::gapminder %&gt;%
 filter(year == 2002) %&gt;%
   ggplot() +
-  aes(id = country) +
   labs(title = "142 gapminder countries in 2002") +
+  aes(id = country) +  # req aes
+# default area is 1
   geom_polygon_circlepack(alpha = .5) +
   coord_equal() +
   aes(fill = continent) +
@@ -3847,8 +3979,9 @@ library(dplyr)
 gapminder::gapminder %&gt;%
 filter(year == 2002) %&gt;%
   ggplot() +
-  aes(id = country) +
   labs(title = "142 gapminder countries in 2002") +
+  aes(id = country) +  # req aes
+# default area is 1
   geom_polygon_circlepack(alpha = .5) +
   coord_equal() +
   aes(fill = continent) +
@@ -3901,7 +4034,6 @@ filter(year == 2002) %&gt;%
   font-size: 80%
 }
 &lt;/style&gt;
-
 
 
 
@@ -3980,9 +4112,9 @@ readLines("../R/geom_circle_pack.R")[97:110]
 
 ---
 
-Wish list for ggcirclepack:
+## Top wish list item for ggcirclepack:
 
-More computation under the hood for a count data case.  
+### More computation under the hood for a count data case.  
 
 
 ```r
@@ -4143,49 +4275,63 @@ tidytitanic::tidy_titanic() +
 
 ---
 
-Other wish list item
+## Other wish list item
 
 
 --
 
-Include other circlepacking algorithms?
+### Include other circlepacking algorithms?
 
 --
 
-get feedback from {packcircles} author!  
+### get feedback from {packcircles} author! 
+
+--
+
+### Compare with {ggforce} circle packing, others?
 
 ---
 
-# 'Circles are just the best'  TLP
+## 'Circles are just the best'  TLP
 
 
 --
 
-# If you squint, a Texas and a Circle look like pretty much the same thing.
+## If you squint, a Texas and a Circle look like pretty much the same thing.
 
+--
+
+## In ggplot2's eyes, just polygons.
 
 
 
 ---
 
-### Extremely highly experimental: maps and atlasses.
-
-
-
+### Also experimental: maps and atlasses.
 
 --
 
-aes(where = ?)
---
-aes(country = ?)
+aes(where = ?)  -&gt; xy
 
-aes(state = ?)
+--
+
+aes(x0y0 = ?) -&gt; xy
+
+--
+
+aes(us_state = ?)
+
+--
 
 aes(fips = ?) # us county codes
 
+--
+
 aes(brain_segment = ?)
 
-aes(tissue = ?)
+--
+
+aes(anatomy_tissue = ?)
 
 
 ---
@@ -4202,14 +4348,554 @@ https://evamaerey.github.io/mytidytuesday/2022-11-04-brain/brain.html
 ---
 
 
-https://evamaerey.github.io/mytidytuesday/2023-03-06-us-states/us_states.html
+```r
+knitr::include_graphics("us_states_fail.png_small")
+```
+
+&lt;img src="us_states_fail.png_small" width="30%" /&gt;
+
+'Oh wow cool! That looks like a convenient map layer'
+
+---
+
+### make a map with geom_polygon tutorial:  https://remiller1450.github.io/s230s19/Intro_maps.html
+
+
+```r
+library(maps)
+#&gt; 
+#&gt; Attaching package: 'maps'
+#&gt; The following object is masked from 'package:purrr':
+#&gt; 
+#&gt;     map
+MainStates &lt;- map_data("state")
+StatePopulation &lt;- read.csv("https://raw.githubusercontent.com/ds4stats/r-tutorials/master/intro-maps/data/StatePopulation.csv", as.is = TRUE)
+
+MergedStates &lt;- inner_join(MainStates, StatePopulation, by = "region")
+
+StatePopulation %&gt;% # becomes ggus()
+  right_join(MainStates) %&gt;% # becomes ggus()
+  ggplot() + # becomes ggus()
+  geom_polygon() + # becomes geom_polygon state
+  aes(x = long, # becomes state = region
+      y = lat, # becomes state = region
+      group = group, # becomes state = region
+      fill = population/1000000) + 
+  coord_map(projection = "orthographic", 
+            orientation = c(41, -74, 0))
+#&gt; Joining with `by = join_by(region)`
+#&gt; Warning in right_join(., MainStates): Each row in `x` is expected to match at most 1 row in `y`.
+#&gt; ℹ Row 1 of `x` matches multiple rows.
+#&gt; ℹ If multiple matches are expected, set `multiple = "all"` to silence this
+#&gt;   warning.
+```
+
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/unnamed-chunk-7-1.png" width="100%" /&gt;
+
+---
+
+## create geom_polygon_state() extension
+
+### compute_state
+
+
+```r
+StatePopulation &lt;- read.csv("https://raw.githubusercontent.com/ds4stats/r-tutorials/master/intro-maps/data/StatePopulation.csv", as.is = TRUE)
+
+MainStates %&gt;% 
+  rename(state = region) %&gt;% 
+  rename(which_polygon = group) -&gt;
+continuous_states
+
+compute_state &lt;- function(data, scales){
+ 
+  data %&gt;% 
+    inner_join(continuous_states, multiple = "all") %&gt;% 
+    mutate(x = long, y = lat) %&gt;% 
+    arrange(order) %&gt;%
+    # mutate(group = paste(group, ".", which_polygon)) %&gt;%
+    # group_by(which_polygon) %&gt;%
+    data.frame()
+
+}
+```
+
+
+---
+
+## create geom_polygon_state() extension
+
+### ggproto StatPolygonstate
+
+
+```r
+StatPolygonstate &lt;- ggplot2::ggproto(`_class` = "StatPolygonstate",
+                                  `_inherit` = ggplot2::Stat,
+                                  required_aes = c("state"),
+                                  # setup_data = my_setup_data,
+                                  compute_panel = compute_state,
+                                  default_aes = aes(group = after_stat(which_polygon))
+                                  )
+
+```
+
+---
+
+## create geom_polygon_state() extension
+
+### the geom itself
+
+
+```r
+geom_polygon_state &lt;- function(
+  mapping = NULL,
+  data = NULL,
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE, ...) {
+  ggplot2::layer(
+    stat = StatPolygonstate,  # proto object from step 2
+    geom = ggplot2::GeomPolygon,  # inherit other behavior
+    data = data,
+    mapping = mapping,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(na.rm = na.rm, ...)
+  )
+}
+
+```
+
+---
+
+count: false
+ 
+
+.panel1-geom_polygon_state-auto[
+
+```r
+*StatePopulation
+```
+]
+ 
+.panel2-geom_polygon_state-auto[
+
+```
+#&gt;            region population elect_votes
+#&gt; 1         alabama    4849377           9
+#&gt; 2          alaska     737732           3
+#&gt; 3         arizona    6731484          11
+#&gt; 4        arkansas    2994079           6
+#&gt; 5      california   38802500          55
+#&gt; 6        colorado    5355856           9
+#&gt; 7     connecticut    3596677           7
+#&gt; 8        delaware     935614           3
+#&gt; 9         florida   19893297          29
+#&gt; 10        georgia   10097343          16
+#&gt; 11         hawaii    1419561           4
+#&gt; 12          idaho    1634464           4
+#&gt; 13       illinois   12880580          20
+#&gt; 14        indiana    6596855          11
+#&gt; 15           iowa    3107126           6
+#&gt; 16         kansas    2904021           6
+#&gt; 17       kentucky    4413457           8
+#&gt; 18      louisiana    4649676           8
+#&gt; 19          maine    1330089           4
+#&gt; 20       maryland    5976407          10
+#&gt; 21  massachusetts    6745408          11
+#&gt; 22       michigan    9909877          16
+#&gt; 23      minnesota    5457173          10
+#&gt; 24    mississippi    2984926           6
+#&gt; 25       missouri    6063589          10
+#&gt; 26        montana    1023579           3
+#&gt; 27       nebraska    1881503           5
+#&gt; 28         nevada    2839099           6
+#&gt; 29  new hampshire    1326813           4
+#&gt; 30     new jersey    8938175          14
+#&gt; 31     new mexico    2085572           5
+#&gt; 32       new york   19746227          29
+#&gt; 33 north carolina    9943964          15
+#&gt; 34   north dakota     739482           3
+#&gt; 35           ohio   11594163          18
+#&gt; 36       oklahoma    3878051           7
+#&gt; 37         oregon    3970239           7
+#&gt; 38   pennsylvania   12787209          20
+#&gt; 39   rhode island    1055173           4
+#&gt; 40 south carolina    4832482           9
+#&gt; 41   south dakota     853175           3
+#&gt; 42      tennessee    6549352          11
+#&gt; 43          texas   26956958          38
+#&gt; 44           utah    2942902           6
+#&gt; 45        vermont     626011           3
+#&gt; 46       virginia    8326289          13
+#&gt; 47     washington    7061530          12
+#&gt; 48  west virginia    1850326           5
+#&gt; 49      wisconsin    5757564          10
+#&gt; 50        wyoming     584153           3
+```
+]
+
+---
+count: false
+ 
+
+.panel1-geom_polygon_state-auto[
+
+```r
+StatePopulation %&gt;%
+* mutate(region = region %&gt;% stringr::str_trim() %&gt;% as.factor())
+```
+]
+ 
+.panel2-geom_polygon_state-auto[
+
+```
+#&gt;            region population elect_votes
+#&gt; 1         alabama    4849377           9
+#&gt; 2          alaska     737732           3
+#&gt; 3         arizona    6731484          11
+#&gt; 4        arkansas    2994079           6
+#&gt; 5      california   38802500          55
+#&gt; 6        colorado    5355856           9
+#&gt; 7     connecticut    3596677           7
+#&gt; 8        delaware     935614           3
+#&gt; 9         florida   19893297          29
+#&gt; 10        georgia   10097343          16
+#&gt; 11         hawaii    1419561           4
+#&gt; 12          idaho    1634464           4
+#&gt; 13       illinois   12880580          20
+#&gt; 14        indiana    6596855          11
+#&gt; 15           iowa    3107126           6
+#&gt; 16         kansas    2904021           6
+#&gt; 17       kentucky    4413457           8
+#&gt; 18      louisiana    4649676           8
+#&gt; 19          maine    1330089           4
+#&gt; 20       maryland    5976407          10
+#&gt; 21  massachusetts    6745408          11
+#&gt; 22       michigan    9909877          16
+#&gt; 23      minnesota    5457173          10
+#&gt; 24    mississippi    2984926           6
+#&gt; 25       missouri    6063589          10
+#&gt; 26        montana    1023579           3
+#&gt; 27       nebraska    1881503           5
+#&gt; 28         nevada    2839099           6
+#&gt; 29  new hampshire    1326813           4
+#&gt; 30     new jersey    8938175          14
+#&gt; 31     new mexico    2085572           5
+#&gt; 32       new york   19746227          29
+#&gt; 33 north carolina    9943964          15
+#&gt; 34   north dakota     739482           3
+#&gt; 35           ohio   11594163          18
+#&gt; 36       oklahoma    3878051           7
+#&gt; 37         oregon    3970239           7
+#&gt; 38   pennsylvania   12787209          20
+#&gt; 39   rhode island    1055173           4
+#&gt; 40 south carolina    4832482           9
+#&gt; 41   south dakota     853175           3
+#&gt; 42      tennessee    6549352          11
+#&gt; 43          texas   26956958          38
+#&gt; 44           utah    2942902           6
+#&gt; 45        vermont     626011           3
+#&gt; 46       virginia    8326289          13
+#&gt; 47     washington    7061530          12
+#&gt; 48  west virginia    1850326           5
+#&gt; 49      wisconsin    5757564          10
+#&gt; 50        wyoming     584153           3
+```
+]
+
+---
+count: false
+ 
+
+.panel1-geom_polygon_state-auto[
+
+```r
+StatePopulation %&gt;%
+  mutate(region = region %&gt;% stringr::str_trim() %&gt;% as.factor()) %&gt;%
+* ggplot(data = .)
+```
+]
+ 
+.panel2-geom_polygon_state-auto[
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/geom_polygon_state_auto_03_output-1.png" width="100%" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-geom_polygon_state-auto[
+
+```r
+StatePopulation %&gt;%
+  mutate(region = region %&gt;% stringr::str_trim() %&gt;% as.factor()) %&gt;%
+  ggplot(data = .) +
+* aes(state = region)   # state indicates position instead of x and y
+```
+]
+ 
+.panel2-geom_polygon_state-auto[
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/geom_polygon_state_auto_04_output-1.png" width="100%" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-geom_polygon_state-auto[
+
+```r
+StatePopulation %&gt;%
+  mutate(region = region %&gt;% stringr::str_trim() %&gt;% as.factor()) %&gt;%
+  ggplot(data = .) +
+  aes(state = region) +  # state indicates position instead of x and y
+* geom_polygon_state()
+```
+]
+ 
+.panel2-geom_polygon_state-auto[
+
+```
+#&gt; Joining with `by = join_by(state)`
+```
+
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/geom_polygon_state_auto_05_output-1.png" width="100%" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-geom_polygon_state-auto[
+
+```r
+StatePopulation %&gt;%
+  mutate(region = region %&gt;% stringr::str_trim() %&gt;% as.factor()) %&gt;%
+  ggplot(data = .) +
+  aes(state = region) +  # state indicates position instead of x and y
+  geom_polygon_state() +
+* aes(fill = population)
+```
+]
+ 
+.panel2-geom_polygon_state-auto[
+
+```
+#&gt; Joining with `by = join_by(state)`
+```
+
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/geom_polygon_state_auto_06_output-1.png" width="100%" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-geom_polygon_state-auto[
+
+```r
+StatePopulation %&gt;%
+  mutate(region = region %&gt;% stringr::str_trim() %&gt;% as.factor()) %&gt;%
+  ggplot(data = .) +
+  aes(state = region) +  # state indicates position instead of x and y
+  geom_polygon_state() +
+  aes(fill = population) +
+* coord_map(projection = "orthographic",
+*           orientation = c(41, -74, 0))
+```
+]
+ 
+.panel2-geom_polygon_state-auto[
+
+```
+#&gt; Joining with `by = join_by(state)`
+```
+
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/geom_polygon_state_auto_07_output-1.png" width="100%" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-geom_polygon_state-auto[
+
+```r
+StatePopulation %&gt;%
+  mutate(region = region %&gt;% stringr::str_trim() %&gt;% as.factor()) %&gt;%
+  ggplot(data = .) +
+  aes(state = region) +  # state indicates position instead of x and y
+  geom_polygon_state() +
+  aes(fill = population) +
+  coord_map(projection = "orthographic",
+            orientation = c(41, -74, 0)) +
+* geom_polygon_state(data = . %&gt;%
+*                      filter(region == "new york"),
+*                    color = "red" )
+```
+]
+ 
+.panel2-geom_polygon_state-auto[
+
+```
+#&gt; Joining with `by = join_by(state)`
+#&gt; Joining with `by = join_by(state)`
+```
+
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/geom_polygon_state_auto_08_output-1.png" width="100%" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-geom_polygon_state-auto[
+
+```r
+StatePopulation %&gt;%
+  mutate(region = region %&gt;% stringr::str_trim() %&gt;% as.factor()) %&gt;%
+  ggplot(data = .) +
+  aes(state = region) +  # state indicates position instead of x and y
+  geom_polygon_state() +
+  aes(fill = population) +
+  coord_map(projection = "orthographic",
+            orientation = c(41, -74, 0)) +
+  geom_polygon_state(data = . %&gt;%
+                       filter(region == "new york"),
+                     color = "red" ) +
+* geom_polygon_state(data = . %&gt;%
+*                      filter(region == "colorado"),
+*                    color = "green" )
+```
+]
+ 
+.panel2-geom_polygon_state-auto[
+
+```
+#&gt; Joining with `by = join_by(state)`
+#&gt; Joining with `by = join_by(state)`
+#&gt; Joining with `by = join_by(state)`
+```
+
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/geom_polygon_state_auto_09_output-1.png" width="100%" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-geom_polygon_state-auto[
+
+```r
+StatePopulation %&gt;%
+  mutate(region = region %&gt;% stringr::str_trim() %&gt;% as.factor()) %&gt;%
+  ggplot(data = .) +
+  aes(state = region) +  # state indicates position instead of x and y
+  geom_polygon_state() +
+  aes(fill = population) +
+  coord_map(projection = "orthographic",
+            orientation = c(41, -74, 0)) +
+  geom_polygon_state(data = . %&gt;%
+                       filter(region == "new york"),
+                     color = "red" ) +
+  geom_polygon_state(data = . %&gt;%
+                       filter(region == "colorado"),
+                     color = "green" ) +
+* scale_fill_viridis_c(option = "magma", end = .9)
+```
+]
+ 
+.panel2-geom_polygon_state-auto[
+
+```
+#&gt; Joining with `by = join_by(state)`
+#&gt; Joining with `by = join_by(state)`
+#&gt; Joining with `by = join_by(state)`
+```
+
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/geom_polygon_state_auto_10_output-1.png" width="100%" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-geom_polygon_state-auto[
+
+```r
+StatePopulation %&gt;%
+  mutate(region = region %&gt;% stringr::str_trim() %&gt;% as.factor()) %&gt;%
+  ggplot(data = .) +
+  aes(state = region) +  # state indicates position instead of x and y
+  geom_polygon_state() +
+  aes(fill = population) +
+  coord_map(projection = "orthographic",
+            orientation = c(41, -74, 0)) +
+  geom_polygon_state(data = . %&gt;%
+                       filter(region == "new york"),
+                     color = "red" ) +
+  geom_polygon_state(data = . %&gt;%
+                       filter(region == "colorado"),
+                     color = "green" ) +
+  scale_fill_viridis_c(option = "magma", end = .9) +
+* ggstamp::stamp_point(y = 30.2, x = -97.7,
+*                      color = "goldenrod1",
+*                      size = 2)
+```
+]
+ 
+.panel2-geom_polygon_state-auto[
+
+```
+#&gt; Joining with `by = join_by(state)`
+#&gt; Joining with `by = join_by(state)`
+#&gt; Joining with `by = join_by(state)`
+```
+
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/geom_polygon_state_auto_11_output-1.png" width="100%" /&gt;
+]
+
+&lt;style&gt;
+.panel1-geom_polygon_state-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-geom_polygon_state-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-geom_polygon_state-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
 
 
 
 
 ---
 
-# U.S. counties
+# U.S. counties, fips
 
 - inheriting from geom_sf()
 - 'computing' fips sf geometries column (xy perimeters) based on aes = my_fips_code
@@ -4258,7 +4944,7 @@ a +
 #&gt; Warning: Removed 1 row containing missing values (`geom_path()`).
 ```
 
-&lt;img src="circle_pack_and_beyond_talk_files/figure-html/unnamed-chunk-6-1.png" width="100%" /&gt;
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/unnamed-chunk-11-1.png" width="100%" /&gt;
 
 ```r
 

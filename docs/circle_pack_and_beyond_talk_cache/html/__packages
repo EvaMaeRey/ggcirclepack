@@ -12,3 +12,6 @@ lubridate
 magrittr
 ggpolypath
 gganatogram
+ggstamp
+maps
+packcircles
