@@ -4,3 +4,11 @@ magrittr
 dplyr
 ggpolypath
 gganatogram
+tidyverse
+tibble
+tidyr
+readr
+purrr
+stringr
+forcats
+lubridate

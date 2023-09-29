@@ -1,188 +1,356 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# ggcirclepack and beyond - highly experimental
+# ggcirclepack
 
 <!-- badges: start -->
 
 <!-- badges: end -->
 
-Critical moment in my extension journey started with TLP “extend your
-ability to extend”.
+circle pack is an experimental package that uses packcircles to handle
+circle packing computation.
 
-Message 1: you can be an extender
-
-–
-
-Message 2: “where” aesthetics need not only be x and y.
-
-–
-
-aes(x0 = ?, y0 = ?)
-
-–
-
-And what ggplot2 actually looks at is computed for you (x and y)
-
------
-
-Today I’ll present on ggcirclepack.
-
------
-
-Background: ggplot2 grammar guide walk through (reference from data to
-viz gallery)
+# status quo w/o {ggcirclepack}: loads of work before plotting
 
 ``` r
-knitr::include_url("https://evamaerey.github.io/ggplot2_grammar_guide/geoms_single_series.html#77")
+gapminder::gapminder %>%  
+  filter(continent == "Americas") %>%  
+  filter(year == 2002) %>%  
+  select(country, pop) ->  
+prep  
+
+packcircles::circleProgressiveLayout(prep$pop,  
+                                         sizetype = 'area') ->  
+pack  
+
+pack %>%  
+  packcircles::circleLayoutVertices(npoints = 50) ->  
+circle_outlines  
+
+circle_outlines %>%  
+  ggplot() +  
+  aes(x = x, y = y) +  
+  geom_polygon(colour = "black", alpha = 0.6) +  
+  aes(group = id) +  
+  aes(fill = factor(id)) +  
+  geom_text(data = cbind(prep, pack),  
+            aes(x, y, size = pop, label = country,  
+                group = NULL, fill = NULL)) +  
+  theme(legend.position = "none") +  
+  coord_equal()
 ```
 
-<iframe src="https://evamaerey.github.io/ggplot2_grammar_guide/geoms_single_series.html#77" width="100%" height="400px" data-external="1">
+<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
 
-</iframe>
-
-–
-
-This didn’t feel like powerful ggplot2 experience
-
-–
-
-What would ggcirclepack look like?
-
------
-
-Here, the id of the circle isn’t defined by the center, x0y0, but by its
-id and area (an algorithm used under the hood to find x0y0 and x and y
-for perimeter)
-
-–
-
-Working with compute\_panel(), ggols
-
------
-
-## Installation
-
-You can install the development version of ggcirclepack from
-[GitHub](https://github.com/) with:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("EvaMaeRey/ggcirclepack")
-```
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
+## Proposed UI and current behavior
 
 ``` r
 library(ggcirclepack)
-library(ggplot2)
-library(magrittr)
-library(dplyr)
+library(tidyverse)
 
 gapminder::gapminder %>%
 filter(year == 2002) %>%
   ggplot() +
   aes(id = country) +
   geom_polygon_circlepack(alpha = .5) + 
-  coord_equal()
-#> Joining with `by = join_by(id)`
-```
-
-<img src="man/figures/README-example-1.png" width="100%" />
-
-``` r
+  coord_equal() + 
+  labs(title = "gapminder 2002 countries")
 
 last_plot() +
   aes(fill = continent) + 
-  labs(title = "gapminder 2002 countries")
-#> Joining with `by = join_by(id)`
-```
-
-<img src="man/figures/README-example-2.png" width="100%" />
-
-``` r
+  labs(title = "from 5 continents")
 
 last_plot() +
   aes(area = pop) + 
-  geom_text_circlepack()
-#> Joining with `by = join_by(id)`
-```
-
-<img src="man/figures/README-example-3.png" width="100%" />
-
-``` r
+  geom_text_circlepack() + 
+  labs(title = "with very different populations")
 
 last_plot() +
-  facet_wrap(facets = vars(continent))
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-```
-
-<img src="man/figures/README-example-4.png" width="100%" />
-
-``` r
+  facet_wrap(facets = vars(continent)) + 
+  labs(title = "faceting")
 
 last_plot() + 
   scale_size_continuous(range = c(0, 4)) + 
-  theme(legend.position = "none")
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-```
-
-<img src="man/figures/README-example-5.png" width="100%" />
-
-``` r
+  theme(legend.position = "none") + 
+  labs(title = "remove legends")
 
 last_plot() + 
-  aes(area = gdpPercap*pop)
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-```
-
-<img src="man/figures/README-example-6.png" width="100%" />
-
-``` r
+  aes(area = gdpPercap*pop) + 
+  labs(title = "and very different GDPs")
 
 last_plot() + 
-  aes(area = gdpPercap)
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
+  aes(area = gdpPercap) + 
+  labs(title = "and per capita GDPs")
+```
+
+<img src="man/figures/README-example-1.png" width="33%" /><img src="man/figures/README-example-2.png" width="33%" /><img src="man/figures/README-example-3.png" width="33%" /><img src="man/figures/README-example-4.png" width="33%" /><img src="man/figures/README-example-5.png" width="33%" /><img src="man/figures/README-example-6.png" width="33%" /><img src="man/figures/README-example-7.png" width="33%" />
+
+``` r
+gapminder::gapminder %>%
+filter(year == 2002) %>%
+  ggplot() +
+  aes(id = country) +
+  geom_polygon_circlepack(alpha = .5) + 
+  coord_equal() +
+  aes(area = pop) + 
+  geom_text_circlepack(aes(label = after_stat(
+    paste(id, "\n",
+    round(area/1000000, 1), "mil."))), lineheight = .8)
 #> Joining with `by = join_by(id)`
 ```
 
-<img src="man/figures/README-example-7.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
------
+# Package functions
 
-Wish list for ggcirclepack:
+## geom\_circle\_pack
 
-More computation under the hood for a count data case.
+``` r
+#' compute_panel_circle_pack
+#'
+#' @param data
+#' @param scales
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' library(ggplot2)
+#' library(magrittr)
+#' library(dplyr)
+#' gapminder::gapminder %>%
+#' filter(continent == "Americas") %>%
+#'   filter(year == 2002) %>%
+#'   # input must have required aesthetic inputs as columns
+#'   rename(area = pop) %>%
+#'   compute_panel_circle_pack() %>%
+#'   head()
+#'
+#'   gapminder::gapminder %>%
+#' filter(continent == "Americas") %>%
+#'  filter(year == 2002) %>%
+#'  # input must have required aesthetic inputs as columns
+#'  rename(area = pop) %>%
+#'  compute_panel_circle_pack() %>%
+#'  ggplot() +
+#'  aes(x = x, y = y, fill = country) +
+#'  geom_polygon()
+compute_panel_circle_pack <- function(data, scales){
+
+  data %>%
+    mutate(id = row_number()) ->
+    data1
+
+  if(is.null(data$area)){
+
+    data1 %>%
+      mutate(area = 1) ->
+      data1
+
+  }
+
+  data1 %>%
+    pull(area) %>%
+    packcircles::circleProgressiveLayout(
+      sizetype = 'area') %>%
+    packcircles::circleLayoutVertices(npoints = 300) %>%
+    left_join(data1) #%>%
+
+}
+
+
+StatCirclepack <- ggplot2::ggproto(`_class` = "StatCirclepack",
+                                  `_inherit` = ggplot2::Stat,
+                                  required_aes = c("id"),
+                                  compute_panel = compute_panel_circle_pack,
+                                  # setup_data = my_setup_data,
+                                  default_aes = ggplot2::aes(group = after_stat(id))
+                                  )
+
+
+#' Title
+#'
+#' @param mapping
+#' @param data
+#' @param position
+#' @param na.rm
+#' @param show.legend
+#' @param inherit.aes
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' library(ggplot2)
+#' library(magrittr)
+#' library(dplyr)
+#' gapminder::gapminder %>%
+#' filter(year == 2002) %>%
+#'   ggplot() +
+#'   aes(id = country) +
+#'   geom_polygon_circlepack(alpha = .5, size = .002)
+#'
+#' last_plot() +
+#'   aes(fill = continent)
+#'
+#' last_plot() +
+#'   aes(area = pop)
+#'
+#' last_plot() +
+#'   aes(color = continent) +
+#'   facet_wrap(facets = vars(continent))
+geom_polygon_circlepack <- function(mapping = NULL, data = NULL,
+                           position = "identity", na.rm = FALSE,
+                           show.legend = NA,
+                           inherit.aes = TRUE, ...) {
+  ggplot2::layer(
+    stat = StatCirclepack, # proto object from Step 2
+    geom = ggplot2::GeomPolygon, # inherit other behavior
+    data = data,
+    mapping = mapping,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(na.rm = na.rm, ...)
+  )
+}
+```
+
+## geom\_text\_circlepack
+
+``` r
+#' compute_panel_circle_pack
+#'
+#' @param data
+#' @param scales
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' library(ggplot2)
+#' library(magrittr)
+#' library(dplyr)
+#' gapminder::gapminder %>%
+#' filter(continent == "Americas") %>%
+#'   filter(year == 2002) %>%
+#'   # input must have required aesthetic inputs as columns
+#'   rename(area = pop) %>%
+#'   compute_panel_circle_pack() %>%
+#'   head()
+#'
+#'  gapminder::gapminder %>%
+#'    filter(continent == "Americas") %>%
+#'  filter(year == 2002) %>%
+#'  # input must have required aesthetic inputs as columns
+#'  rename(area = pop) %>%
+#'  compute_panel_circle_pack() %>%
+#'  ggplot() +
+#'  aes(x = x, y = y, fill = country) +
+#'  geom_polygon()
+compute_panel_circle_pack_center <- function(data, scales){
+
+  data ->
+    data1
+
+  if(is.null(data$area)){
+
+    data1 %>%
+      mutate(area = 1) ->
+      data1
+
+  }
+
+  data1 %>%
+    pull(area) %>%
+    packcircles::circleProgressiveLayout(
+      sizetype = 'area') %>%
+    cbind(data1) %>%
+    mutate(label = id)
+
+}
+
+
+
+
+StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
+                                  `_inherit` = ggplot2::Stat,
+                                  required_aes = c("id"),
+                                  compute_panel = compute_panel_circle_pack_center,
+                                  # setup_data = my_setup_data,
+                                  default_aes = ggplot2::aes(group = after_stat(id),
+                                                             size = after_stat(area))
+                                  )
+
+
+#' Title
+#'
+#' @param mapping
+#' @param data
+#' @param position
+#' @param na.rm
+#' @param show.legend
+#' @param inherit.aes
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' library(ggplot2)
+#' library(magrittr)
+#' library(dplyr)
+#' gapminder::gapminder %>%
+#' filter(year == 2002) %>%
+#'   ggplot() +
+#'   aes(id = country) +
+#'   geom_text_circlepack(alpha = .5)
+#'
+#' last_plot() +
+#'   aes(fill = continent)
+#'
+#' last_plot() +
+#'   aes(area = pop)
+#'
+#' last_plot() +
+#'   facet_wrap(facets = vars(continent))
+geom_text_circlepack <- function(mapping = NULL, data = NULL,
+                           position = "identity", na.rm = FALSE,
+                           show.legend = NA,
+                           inherit.aes = TRUE, ...) {
+  ggplot2::layer(
+    stat = StatCirclepackcenter, # proto object from Step 2
+    geom = ggplot2::GeomText, # inherit other behavior
+    data = data,
+    mapping = mapping,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(na.rm = na.rm, ...)
+  )
+}
+```
+
+``` r
+readme2pkg::chunk_to_r(c("geom_circle_pack","geom_circle_pack_text"))
+```
+
+### Issues
+
+Wish list for ggcirclepack: More computation under the hood for a count
+data case.
 
 ``` r
 tidytitanic::tidy_titanic %>% 
   head()
-#> # A tibble: 6 × 5
-#>      id class sex   age   survived
-#>   <int> <fct> <fct> <fct> <fct>   
-#> 1     1 3rd   Male  Child No      
-#> 2     2 3rd   Male  Child No      
-#> 3     3 3rd   Male  Child No      
-#> 4     4 3rd   Male  Child No      
-#> 5     5 3rd   Male  Child No      
-#> 6     6 3rd   Male  Child No
+#>   id class  sex   age survived
+#> 1  1   3rd Male Child       No
+#> 2  2   3rd Male Child       No
+#> 3  3   3rd Male Child       No
+#> 4  4   3rd Male Child       No
+#> 5  5   3rd Male Child       No
+#> 6  6   3rd Male Child       No
 ```
 
     tidytitanic::tidy_titanic() + 
@@ -194,206 +362,3 @@ tidytitanic::tidy_titanic %>%
       aes(color = age) + 
       aes(alpha = survived) + 
       facet_wrap(~class)
-
------
-
-Other wish list item.. Include other circlepacking algorithms.
-
-–
-
-get feedback from pack circles author\!
-
------
-
-### Extremely highly experimental: maps and atlasses.
-
-–
-
-## aes(where = ?)
-
-aes(country = ?)
-
-aes(state = ?)
-
-aes(fips = ?) \# us county codes
-
-aes(brain\_segment = ?)
-
-aes(tissue = ?)
-
------
-
-# U.S. States
-
-  - inheriting from geom\_polygon
-  - ‘computing’ state xy perimeter based aes = my\_state\_var
-  - Ryan Miller tutorial start point.
-
-<!-- end list -->
-
-``` r
-knitr::include_url("https://evamaerey.github.io/mytidytuesday/2022-11-04-brain/brain.html")
-```
-
-<iframe src="https://evamaerey.github.io/mytidytuesday/2022-11-04-brain/brain.html" width="100%" height="400px" data-external="1">
-
-</iframe>
-
------
-
-``` r
-knitr::include_url("https://evamaerey.github.io/mytidytuesday/2023-03-06-us-states/us_states.html")
-```
-
-<iframe src="https://evamaerey.github.io/mytidytuesday/2023-03-06-us-states/us_states.html" width="100%" height="400px" data-external="1">
-
-</iframe>
-
------
-
-# U.S. counties
-
-  - inheriting from geom\_sf()
-  - ‘computing’ fips sf geometries column (xy perimeters) based on aes =
-    my\_fips\_code
-  - Wilke example start point
-
-<!-- end list -->
-
-``` r
-knitr::include_url("https://evamaerey.github.io/mytidytuesday/2023-03-10-ggfips/ggfips_w_sf.html")
-```
-
-<iframe src="https://evamaerey.github.io/mytidytuesday/2023-03-10-ggfips/ggfips_w_sf.html" width="100%" height="400px" data-external="1">
-
-</iframe>
-
------
-
-# Brain seg
-
-  - inheriting from geom\_sf()
-  - ‘computing’ tissue space based on aes = my\_seg\_name variable
-  - atlases from ggseg
-
-<!-- end list -->
-
-``` r
-knitr::include_url("https://evamaerey.github.io/mytidytuesday/2023-03-12-ggbrain-seg-sf/ggbrain_seg_sf.html")
-```
-
-<iframe src="https://evamaerey.github.io/mytidytuesday/2023-03-12-ggbrain-seg-sf/ggbrain_seg_sf.html" width="100%" height="400px" data-external="1">
-
-</iframe>
-
------
-
-``` r
-library(gganatogram)
-
-a <- gganatogram(data=hgFemale_key, outline = T, fillOutline='#a6bddb', organism='human', sex='female', fill="colour") 
-
-hgFemale_key$organ %>% length()
-#> [1] 70
-
-
-a + 
-  ggstamp::stamp_wash() +
-  geom_path(data = hgFemale_list$brain, aes(x = x, y = -y), color = "red", size = .5, linetype = "dashed") +
-  coord_equal()
-#> Warning in annotate(geom = "rect", xmin = xmin, ymin = ymin, xmax = xmax, :
-#> Ignoring unknown aesthetics: x and y
-#> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-#> ℹ Please use `linewidth` instead.
-#> This warning is displayed once every 8 hours.
-#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-#> generated.
-#> Warning: Removed 1 row containing missing values (`geom_path()`).
-```
-
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
-
-``` r
-
-
-hgFemale_list$liver %>% 
-  rename(organ = id) %>% 
-  left_join(hgFemale_key) ->
-liver_with_other_info
-#> Joining with `by = join_by(organ)`
-```
-
-# chat gpt? Confidently writes something…
-
-write me a ggplot2 extension for circle packing:
-
-Sure, here’s an example of a ggplot2 extension for circle packing:
-
-``` r
-# Load necessary packages
-library(ggplot2)
-library(grid)
-library(gridExtra)
-library(viridis)
-library(dplyr)
-
-# Define a function to create circle packing plot
-circle_packing_plot <- function(data, size, color = NULL, palette = viridis::viridis, alpha = 0.8, ...) {
-  
-  # Prepare data for plotting
-  data <- data %>%
-    arrange(desc(size)) %>%
-    mutate(id = row_number()) %>%
-    mutate(parent = ifelse(id == 1, NA, id - 1)) %>%
-    mutate(name = paste(id, "-", name)) %>%
-    select(id, parent, name, size, color)
-  
-  # Calculate layout of circles
-  layout <- packcircles(data$size)
-  
-  # Create a blank canvas to draw the plot
-  canvas <- ggplot(data.frame(x = c(-1, 1), y = c(-1, 1)), aes(x = x, y = y)) +
-    geom_blank() +
-    coord_fixed() +
-    theme_void() +
-    theme(plot.margin = unit(c(1,1,1,1), "cm"))
-  
-  # Create a circle for each data point
-  circles <- lapply(seq_len(nrow(data)), function(i) {
-    gg <- ggplot(data[i, ], aes(x = layout$circle.x[i], y = layout$circle.y[i])) +
-      geom_circle(aes(r = layout$radius[i], fill = color), alpha = alpha) +
-      ggtitle(data$name[i]) +
-      scale_fill_gradientn(colors = palette, na.value = "white") +
-      guides(fill = FALSE) +
-      theme_void()
-    gg
-  })
-  
-  # Combine the circles and the canvas into a single plot
-  plot <- grid.arrange(
-    grobs = circles,
-    ncol = 1,
-    widths = unit(1, "npc"),
-    heights = unit(layout$height, "npc")
-  )
-  
-  plot <- arrangeGrob(canvas, plot, nrow = 1, heights = c(0.15, 0.85))
-  
-  return(plot)
-}
-
-# Register the circle packing plot function as a ggplot2 extension
-ggplot2::ggplot2_register_extension("circle_packing", circle_packing_plot)
-
-
-# With this extension, you can create a circle packing plot by using the geom_circle_pack() function in ggplot2. Here's an example usage:
-
-data(mtcars)
-
-# Create circle packing plot
-ggplot(mtcars, aes(size = mpg, color = wt)) +
-  geom_circle_pack() +
-  labs(title = "Circle Packing Plot of Cars") +
-  scale_size_continuous(name = "Miles per Gallon") +
-  scale_color_continuous(name = "Weight")
-```

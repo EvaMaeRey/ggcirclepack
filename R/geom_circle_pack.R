@@ -51,8 +51,6 @@ compute_panel_circle_pack <- function(data, scales){
 }
 
 
-
-
 StatCirclepack <- ggplot2::ggproto(`_class` = "StatCirclepack",
                                   `_inherit` = ggplot2::Stat,
                                   required_aes = c("id"),

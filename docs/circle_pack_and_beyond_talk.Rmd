@@ -25,14 +25,15 @@ knitr::opts_chunk$set(
 )
 ```
 
-# ggcirclepack and beyond: experiments in the compute_panel space
+class: center
+
 
 <!-- badges: start -->
 <!-- badges: end -->
 
 
 
-```{r cars, echo = F, cache=T}
+```{r cars, echo = F, cache=T, message=FALSE, warning=FALSE, fig.align='center', out.width="40%"}
 library(tidyverse)
 library(ggstamp)  
 set.seed(1243)
@@ -48,7 +49,7 @@ runif(100) %>% c(.,runif(300, max = .2)) %>%
   geom_polygon_circlepack(alpha = .70) + 
   coord_equal() + 
   aes(fill = color) +
-  stamp_text( y = -.2, 
+  stamp_text( y = -.2, size = 12,
              label = "ggcirclepack",
              color = "black") + 
   # coord_equal(xlim = c(-3,3), ylim = c(-2.3, 2.3)) + 
@@ -63,8 +64,13 @@ runif(100) %>% c(.,runif(300, max = .2)) %>%
                         ) +
   theme_void_fill(fill = "cadetblue") +
   theme(legend.position = "none")
-  NULL
+
 ```
+
+## {ggcirclepack} and beyond: 
+
+##experiments in the compute_panel space
+
 
 
 ```{r magick, echo = F, eval = F}
@@ -76,13 +82,21 @@ magick::image_read("hex_sticker_ma_206.png") %>%
 ```
 
 
+---
+
+### Critical moment in my extension journey started with TLP "extend your ability to extend".  
+
+```{r, out.width="70%", echo = F}
+knitr::include_graphics("circles_are_just_the_best.png")
+```
 
 ---
 
 ## Critical moment in my extension journey started with TLP "extend your ability to extend".  
---
 
-## Message 1: you can be an extender 
+
+
+## Message 1: YOU can be an extender 
 
 --
 
@@ -94,18 +108,23 @@ magick::image_read("hex_sticker_ma_206.png") %>%
 
 --
 
-### - And what ggplot2 actually renders, it computes for you (x and y)
+### - but ggplot2 actually renders x and y, it computes them for you!
 
 ---
+
 
 
 # Today I'll present on ggcirclepack. 
 
----
+--
 
 ## Background: ggplot2 grammar guide walk through (reference from data to viz gallery)
 
 https://evamaerey.github.io/ggplot2_grammar_guide/geoms_single_series.html#77
+
+```{r, echo =F, out.width="70%"}
+knitr::include_graphics("data_to_viz_circlepack.png")
+```
 
 ---
 
@@ -164,15 +183,21 @@ circle_outlines %>%
 
 ---
 
-### in a {ggpackcircles}, the answer 'where/which' of the circle isn't defined by the center, x0y0, but by its *id* and *area* (an algorithm used under the hood to find x0y0 and x and y for perimeter); 
+### in a ggpackcircles::geom_polygon_circlepack(), 
 
 --
 
-### and the id and areas of all of the other circles to be drawn
+### the answer 'where?/which?' of the circle isn't defined by a given center, x0y0, 
 
 --
 
-### the *exactly where* (x and y perimeter) gets computed in the background by packing algorithm and ggplot2
+## but by its *ids* and *areas*, i.e. ase(id = my_entities, area = their_characteristic)
+
+---
+
+
+## based on these inputs and an algorithm ggplot2 can compute it's 'where?', the x and y to render.
+
 
 --
 
@@ -345,7 +370,7 @@ https://evamaerey.github.io/mytidytuesday/2022-11-04-brain/brain.html
 
 ---
 
-```{r, out.width="30%"}
+```{r, out.width="50%"}
 knitr::include_graphics("us_states_fail.png_small")
 ```
 
@@ -353,33 +378,38 @@ knitr::include_graphics("us_states_fail.png_small")
 
 ---
 
-### make a map with geom_polygon tutorial:  https://remiller1450.github.io/s230s19/Intro_maps.html
+### WO extension make a map with geom_polygon tutorial:  https://remiller1450.github.io/s230s19/Intro_maps.html
 
-```{r}
+--
+
+`r flipbookr::chunk_reveal("maps_original", break_type = 2)`
+
+```{r maps_original, include = F}
 library(maps)
 MainStates <- map_data("state")
 StatePopulation <- read.csv("https://raw.githubusercontent.com/ds4stats/r-tutorials/master/intro-maps/data/StatePopulation.csv", as.is = TRUE)
 
-MergedStates <- inner_join(MainStates, StatePopulation, by = "region")
+MergedStates <- inner_join(MainStates, 
+                           StatePopulation, 
+                           by = "region")
 
-StatePopulation %>% # becomes ggus()
-  right_join(MainStates) %>% # becomes ggus()
-  ggplot() + # becomes ggus()
-  geom_polygon() + # becomes geom_polygon state
-  aes(x = long, # becomes state = region
-      y = lat, # becomes state = region
-      group = group, # becomes state = region
+StatePopulation %>% 
+  right_join(MainStates) %>% 
+  ggplot() + 
+  geom_polygon() + 
+  aes(x = long, 
+      y = lat, 
+      group = group, 
       fill = population/1000000) + 
   coord_map(projection = "orthographic", 
             orientation = c(41, -74, 0))
-
 ```
 
 ---
 
 ## create geom_polygon_state() extension
 
-### compute_state
+### compute_state ('algorithm' is to join reference data)
 
 ```{r}
 StatePopulation <- read.csv("https://raw.githubusercontent.com/ds4stats/r-tutorials/master/intro-maps/data/StatePopulation.csv", as.is = TRUE)
@@ -481,12 +511,43 @@ StatePopulation %>%
 
 ---
 
-# U.S. counties, fips
+# U.S. counties, geom_polygon_fips?
+
+
+
+```{r fips, echo = F, message = F,warning=F}
+library(tidyverse)
+library(sf)
+
+# Claus on github
+fips_geometries <- readRDS(url("https://wilkelab.org/SDS375/datasets/US_counties.rds")) %>%
+  rename(FIPS = GEOID)
+
+US_census <- read_csv("https://wilkelab.org/SDS375/datasets/US_census.csv",
+                      col_types = cols(FIPS = "c")
+          )
+
+# works
+fips_geometries %>%
+  left_join(US_census, by = "FIPS") %>%
+  ggplot() +
+  geom_sf(aes(fill = home_ownership)) + 
+  scale_fill_viridis_c()
+```
+
+---
+
+`r flipbookr::chunk_reveal("fips")`
+
+---
+
+
+---
+
 
 - inheriting from geom_sf()
-- 'computing' fips sf geometries column (xy perimeters) based on aes = my_fips_code
+- 'computing' fips sf geometries column (xy perimeters) based on aes(fips = my_fips_code)
 - Wilke example start point
-
 
 https://evamaerey.github.io/mytidytuesday/2023-03-10-ggfips/ggfips_w_sf.html
 
@@ -503,8 +564,6 @@ https://evamaerey.github.io/mytidytuesday/2023-03-10-ggfips/ggfips_w_sf.html
 
 
 https://evamaerey.github.io/mytidytuesday/2023-03-12-ggbrain-seg-sf/ggbrain_seg_sf.html
-
-
 
 
 

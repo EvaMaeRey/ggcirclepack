@@ -15,23 +15,19 @@
 
 
 
-# ggcirclepack and beyond: experiments in the compute_panel space
+class: center
+
 
 &lt;!-- badges: start --&gt;
 &lt;!-- badges: end --&gt;
 
 
 
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/cars-1.png" width="40%" style="display: block; margin: auto;" /&gt;
 
-```
-#&gt; Joining with `by = join_by(id)`
-```
+## {ggcirclepack} and beyond: 
 
-&lt;img src="circle_pack_and_beyond_talk_files/figure-html/cars-1.png" width="100%" /&gt;
-
-```
-#&gt; NULL
-```
+##experiments in the compute_panel space
 
 
 
@@ -40,10 +36,17 @@
 
 ---
 
-## Critical moment in my extension journey started with TLP "extend your ability to extend".  
---
+### Critical moment in my extension journey started with TLP "extend your ability to extend".  
 
-## Message 1: you can be an extender 
+&lt;img src="circles_are_just_the_best.png" width="70%" /&gt;
+
+---
+
+## Critical moment in my extension journey started with TLP "extend your ability to extend".  
+
+
+
+## Message 1: YOU can be an extender 
 
 --
 
@@ -55,18 +58,21 @@
 
 --
 
-### - And what ggplot2 actually renders, it computes for you (x and y)
+### - but ggplot2 actually renders x and y, it computes them for you!
 
 ---
+
 
 
 # Today I'll present on ggcirclepack. 
 
----
+--
 
 ## Background: ggplot2 grammar guide walk through (reference from data to viz gallery)
 
 https://evamaerey.github.io/ggplot2_grammar_guide/geoms_single_series.html#77
+
+&lt;img src="data_to_viz_circlepack.png" width="70%" /&gt;
 
 ---
 
@@ -3402,15 +3408,21 @@ circle_outlines %&gt;%
 
 ---
 
-### in a {ggpackcircles}, the answer 'where/which' of the circle isn't defined by the center, x0y0, but by its *id* and *area* (an algorithm used under the hood to find x0y0 and x and y for perimeter); 
+### in a ggpackcircles::geom_polygon_circlepack(), 
 
 --
 
-### and the id and areas of all of the other circles to be drawn
+### the answer 'where?/which?' of the circle isn't defined by a given center, x0y0, 
 
 --
 
-### the *exactly where* (x and y perimeter) gets computed in the background by packing algorithm and ggplot2
+## but by its *ids* and *areas*, i.e. ase(id = my_entities, area = their_characteristic)
+
+---
+
+
+## based on these inputs and an algorithm ggplot2 can compute it's 'where?', the x and y to render.
+
 
 --
 
@@ -4352,51 +4364,125 @@ https://evamaerey.github.io/mytidytuesday/2022-11-04-brain/brain.html
 knitr::include_graphics("us_states_fail.png_small")
 ```
 
-&lt;img src="us_states_fail.png_small" width="30%" /&gt;
+&lt;img src="us_states_fail.png_small" width="50%" /&gt;
 
 'Oh wow cool! That looks like a convenient map layer'
 
 ---
 
-### make a map with geom_polygon tutorial:  https://remiller1450.github.io/s230s19/Intro_maps.html
+### WO extension make a map with geom_polygon tutorial:  https://remiller1450.github.io/s230s19/Intro_maps.html
 
+--
+
+count: false
+ 
+
+.panel1-maps_original-2[
 
 ```r
 library(maps)
-#&gt; 
-#&gt; Attaching package: 'maps'
-#&gt; The following object is masked from 'package:purrr':
-#&gt; 
-#&gt;     map
 MainStates &lt;- map_data("state")
 StatePopulation &lt;- read.csv("https://raw.githubusercontent.com/ds4stats/r-tutorials/master/intro-maps/data/StatePopulation.csv", as.is = TRUE)
 
-MergedStates &lt;- inner_join(MainStates, StatePopulation, by = "region")
+MergedStates &lt;- inner_join(MainStates,
+                           StatePopulation,
+                           by = "region")
 
-StatePopulation %&gt;% # becomes ggus()
-  right_join(MainStates) %&gt;% # becomes ggus()
-  ggplot() + # becomes ggus()
-  geom_polygon() + # becomes geom_polygon state
-  aes(x = long, # becomes state = region
-      y = lat, # becomes state = region
-      group = group, # becomes state = region
-      fill = population/1000000) + 
-  coord_map(projection = "orthographic", 
+StatePopulation %&gt;%
+  right_join(MainStates) %&gt;%
+  ggplot() +
+  geom_polygon() +
+  aes(x = long,
+      y = lat,
+      group = group,
+      fill = population/1000000) +
+  coord_map(projection = "orthographic",
             orientation = c(41, -74, 0))
+```
+]
+ 
+.panel2-maps_original-2[
+
+```
 #&gt; Joining with `by = join_by(region)`
-#&gt; Warning in right_join(., MainStates): Each row in `x` is expected to match at most 1 row in `y`.
-#&gt; ℹ Row 1 of `x` matches multiple rows.
-#&gt; ℹ If multiple matches are expected, set `multiple = "all"` to silence this
-#&gt;   warning.
 ```
 
-&lt;img src="circle_pack_and_beyond_talk_files/figure-html/unnamed-chunk-7-1.png" width="100%" /&gt;
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/maps_original_2_01_output-1.png" width="100%" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-maps_original-2[
+
+```r
+library(maps)
+MainStates &lt;- map_data("state")
+StatePopulation &lt;- read.csv("https://raw.githubusercontent.com/ds4stats/r-tutorials/master/intro-maps/data/StatePopulation.csv", as.is = TRUE)
+
+MergedStates &lt;- inner_join(MainStates,
+                           StatePopulation,
+                           by = "region")
+
+StatePopulation %&gt;%
+  right_join(MainStates) %&gt;%
+  ggplot() +
+  geom_polygon() +
+  aes(x = long,
+      y = lat,
+      group = group,
+      fill = population/1000000) +
+  coord_map(projection = "orthographic",
+            orientation = c(41, -74, 0))
+```
+]
+ 
+.panel2-maps_original-2[
+
+```
+#&gt; Joining with `by = join_by(region)`
+```
+
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/maps_original_2_02_output-1.png" width="100%" /&gt;
+]
+
+&lt;style&gt;
+.panel1-maps_original-2 {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-maps_original-2 {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-maps_original-2 {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
 
 ---
 
 ## create geom_polygon_state() extension
 
-### compute_state
+### compute_state ('algorithm' is to join reference data)
 
 
 ```r
@@ -4895,12 +4981,493 @@ StatePopulation %&gt;%
 
 ---
 
-# U.S. counties, fips
+# U.S. counties, geom_polygon_fips?
+
+
+
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/fips-1.png" width="100%" /&gt;
+
+---
+
+count: false
+ 
+
+.panel1-fips-auto[
+
+```r
+*library(tidyverse)
+```
+]
+ 
+.panel2-fips-auto[
+
+]
+
+---
+count: false
+ 
+
+.panel1-fips-auto[
+
+```r
+library(tidyverse)
+*library(sf)
+```
+]
+ 
+.panel2-fips-auto[
+
+]
+
+---
+count: false
+ 
+
+.panel1-fips-auto[
+
+```r
+library(tidyverse)
+library(sf)
+
+# Claus on github
+*fips_geometries &lt;- readRDS(url("https://wilkelab.org/SDS375/datasets/US_counties.rds"))
+```
+]
+ 
+.panel2-fips-auto[
+
+]
+
+---
+count: false
+ 
+
+.panel1-fips-auto[
+
+```r
+library(tidyverse)
+library(sf)
+
+# Claus on github
+fips_geometries &lt;- readRDS(url("https://wilkelab.org/SDS375/datasets/US_counties.rds")) %&gt;%
+* rename(FIPS = GEOID)
+```
+]
+ 
+.panel2-fips-auto[
+
+]
+
+---
+count: false
+ 
+
+.panel1-fips-auto[
+
+```r
+library(tidyverse)
+library(sf)
+
+# Claus on github
+fips_geometries &lt;- readRDS(url("https://wilkelab.org/SDS375/datasets/US_counties.rds")) %&gt;%
+  rename(FIPS = GEOID)
+
+*US_census &lt;- read_csv("https://wilkelab.org/SDS375/datasets/US_census.csv",
+*                     col_types = cols(FIPS = "c")
+*         )
+```
+]
+ 
+.panel2-fips-auto[
+
+]
+
+---
+count: false
+ 
+
+.panel1-fips-auto[
+
+```r
+library(tidyverse)
+library(sf)
+
+# Claus on github
+fips_geometries &lt;- readRDS(url("https://wilkelab.org/SDS375/datasets/US_counties.rds")) %&gt;%
+  rename(FIPS = GEOID)
+
+US_census &lt;- read_csv("https://wilkelab.org/SDS375/datasets/US_census.csv",
+                      col_types = cols(FIPS = "c")
+          )
+
+# works
+*fips_geometries
+```
+]
+ 
+.panel2-fips-auto[
+
+```
+#&gt; Simple feature collection with 3142 features and 11 fields
+#&gt; Geometry type: MULTIPOLYGON
+#&gt; Dimension:     XY
+#&gt; Bounding box:  xmin: -3683715 ymin: -2839538 xmax: 2258154 ymax: 1558935
+#&gt; CRS:           NA
+#&gt; First 10 features:
+#&gt;    STATEFP COUNTYFP COUNTYNS       AFFGEOID  FIPS          NAME LSAD      ALAND
+#&gt; 1       06      075 00277302 0500000US06075 06075 San Francisco   06  121485107
+#&gt; 2       25      025 00606939 0500000US25025 25025       Suffolk   06  150855462
+#&gt; 3       31      007 00835826 0500000US31007 31007        Banner   06 1932676697
+#&gt; 4       37      181 01008591 0500000US37181 37181         Vance   06  653705784
+#&gt; 5       48      421 01383996 0500000US48421 48421       Sherman   06 2390651189
+#&gt; 6       50      011 01461762 0500000US50011 50011      Franklin   06 1641633748
+#&gt; 7       51      680 01498429 0500000US51680 51680     Lynchburg   25  126842531
+#&gt; 8       05      099 00069169 0500000US05099 05099        Nevada   06 1600192985
+#&gt; 9       08      014 01945881 0500000US08014 08014    Broomfield   06   85478932
+#&gt; 10      16      065 00394803 0500000US16065 16065       Madison   06 1215396379
+#&gt;       AWATER           name state_code                       geometry
+#&gt; 1  479107241     California         CA MULTIPOLYGON (((-2283315 35...
+#&gt; 2  160479920  Massachusetts         MA MULTIPOLYGON (((2009657 799...
+#&gt; 3     397069       Nebraska         NE MULTIPOLYGON (((-664543.3 4...
+#&gt; 4   42187365 North Carolina         NC MULTIPOLYGON (((1544259 321...
+#&gt; 5     428754          Texas         TX MULTIPOLYGON (((-546533.1 -...
+#&gt; 6  150930318        Vermont         VT MULTIPOLYGON (((1780210 102...
+#&gt; 7    1428787       Virginia         VA MULTIPOLYGON (((1458790 122...
+#&gt; 8    7254365       Arkansas         AR MULTIPOLYGON (((232307.6 -4...
+#&gt; 9    1411395       Colorado         CO MULTIPOLYGON (((-775389.1 3...
+#&gt; 10  10500827          Idaho         ID MULTIPOLYGON (((-1272146 82...
+```
+]
+
+---
+count: false
+ 
+
+.panel1-fips-auto[
+
+```r
+library(tidyverse)
+library(sf)
+
+# Claus on github
+fips_geometries &lt;- readRDS(url("https://wilkelab.org/SDS375/datasets/US_counties.rds")) %&gt;%
+  rename(FIPS = GEOID)
+
+US_census &lt;- read_csv("https://wilkelab.org/SDS375/datasets/US_census.csv",
+                      col_types = cols(FIPS = "c")
+          )
+
+# works
+fips_geometries %&gt;%
+* left_join(US_census, by = "FIPS")
+```
+]
+ 
+.panel2-fips-auto[
+
+```
+#&gt; Simple feature collection with 3142 features and 63 fields
+#&gt; Geometry type: MULTIPOLYGON
+#&gt; Dimension:     XY
+#&gt; Bounding box:  xmin: -3683715 ymin: -2839538 xmax: 2258154 ymax: 1558935
+#&gt; CRS:           NA
+#&gt; First 10 features:
+#&gt;    STATEFP COUNTYFP COUNTYNS       AFFGEOID  FIPS          NAME LSAD      ALAND
+#&gt; 1       06      075 00277302 0500000US06075 06075 San Francisco   06  121485107
+#&gt; 2       25      025 00606939 0500000US25025 25025       Suffolk   06  150855462
+#&gt; 3       31      007 00835826 0500000US31007 31007        Banner   06 1932676697
+#&gt; 4       37      181 01008591 0500000US37181 37181         Vance   06  653705784
+#&gt; 5       48      421 01383996 0500000US48421 48421       Sherman   06 2390651189
+#&gt; 6       50      011 01461762 0500000US50011 50011      Franklin   06 1641633748
+#&gt; 7       51      680 01498429 0500000US51680 51680     Lynchburg   25  126842531
+#&gt; 8       05      099 00069169 0500000US05099 05099        Nevada   06 1600192985
+#&gt; 9       08      014 01945881 0500000US08014 08014    Broomfield   06   85478932
+#&gt; 10      16      065 00394803 0500000US16065 16065       Madison   06 1215396379
+#&gt;       AWATER         name.x state_code          state               name.y
+#&gt; 1  479107241     California         CA     California San Francisco County
+#&gt; 2  160479920  Massachusetts         MA  Massachusetts       Suffolk County
+#&gt; 3     397069       Nebraska         NE       Nebraska        Banner County
+#&gt; 4   42187365 North Carolina         NC North Carolina         Vance County
+#&gt; 5     428754          Texas         TX          Texas       Sherman County
+#&gt; 6  150930318        Vermont         VT        Vermont      Franklin County
+#&gt; 7    1428787       Virginia         VA       Virginia       Lynchburg city
+#&gt; 8    7254365       Arkansas         AR       Arkansas        Nevada County
+#&gt; 9    1411395       Colorado         CO       Colorado    Broomfield County
+#&gt; 10  10500827          Idaho         ID          Idaho       Madison County
+#&gt;    pop2010 pop2000 age_under_5 age_under_18 age_over_65 female white black
+#&gt; 1   805235  776733         4.4         13.4        13.6   49.3  48.5   6.1
+#&gt; 2   722023  689807         5.5         17.5        10.5   51.8  56.0  21.6
+#&gt; 3      690     819         5.2         22.3        19.7   48.7  95.7   0.0
+#&gt; 4    45422   42954         6.8         25.4        14.1   53.1  44.2  49.9
+#&gt; 5     3034    3186         7.1         30.2        13.3   49.0  88.3   0.5
+#&gt; 6    47746   45417         6.3         24.7        12.2   50.4  95.6   0.4
+#&gt; 7    75568   65269         6.1         19.6        14.0   53.1  64.4  29.3
+#&gt; 8     8997    9955         6.6         23.7        17.7   51.0  65.9  30.7
+#&gt; 9    55889      NA         7.1         26.2         9.9   50.4  86.1   1.1
+#&gt; 10   37536   27467         9.6         26.0         5.6   51.6  93.9   0.5
+#&gt;    native asian pac_isl two_plus_races hispanic white_not_hispanic
+#&gt; 1     0.5  33.3     0.4            4.7     15.1               41.9
+#&gt; 2     0.4   8.2     0.0            3.9     19.9               48.1
+#&gt; 3     0.4   0.0     0.0            0.7      3.8               95.1
+#&gt; 4     0.3   0.4      NA            1.3      6.7               42.1
+#&gt; 5     0.8   0.2     0.0            1.5     40.4               58.1
+#&gt; 6     1.0   0.5      NA            2.1      1.2               94.9
+#&gt; 7     0.3   2.5     0.0            2.2      3.0               63.0
+#&gt; 8     0.3   0.3     0.0            1.4      2.4               65.1
+#&gt; 9     0.6   6.1      NA            2.8     11.1               79.4
+#&gt; 10    0.3   0.9     0.1            1.5      5.9               91.2
+#&gt;    no_move_in_one_plus_year foreign_born foreign_spoken_at_home hs_grad
+#&gt; 1                      84.0         35.6                   45.4    85.7
+#&gt; 2                      76.7         27.7                   36.8    83.1
+#&gt; 3                      91.3          3.8                    3.3    94.1
+#&gt; 4                      86.9          3.9                    6.7    72.6
+#&gt; 5                      83.9         17.9                   31.9    74.4
+#&gt; 6                      88.1          3.2                    4.8    87.8
+#&gt; 7                      76.9          4.2                    6.3    83.1
+#&gt; 8                      84.7          0.4                    1.0    78.3
+#&gt; 9                      82.8          8.0                   12.4    95.3
+#&gt; 10                     58.1          3.0                    9.7    95.2
+#&gt;    bachelors veterans mean_work_travel housing_units home_ownership
+#&gt; 1       51.2    33078             29.4        376942           37.5
+#&gt; 2       38.9    25698             28.5        315522           36.5
+#&gt; 3       25.1       49             25.6           369           66.3
+#&gt; 4       10.7     3272             23.1         20082           65.2
+#&gt; 5       19.1      233             16.4          1252           78.7
+#&gt; 6       21.2     4054             26.6         21588           74.8
+#&gt; 7       28.3     6213             16.3         31992           56.3
+#&gt; 8       10.7      758             23.8          4563           71.3
+#&gt; 9       44.4     4257             26.8         22646           74.4
+#&gt; 10      30.0     1079             15.2         11280           52.0
+#&gt;    housing_multi_unit median_val_owner_occupied households
+#&gt; 1                66.6                    785200     335956
+#&gt; 2                80.7                    384500     283954
+#&gt; 3                 7.2                     76900        320
+#&gt; 4                 9.6                     98100      16473
+#&gt; 5                 4.0                     80800        971
+#&gt; 6                16.9                    202800      18482
+#&gt; 7                29.8                    139100      27875
+#&gt; 8                 5.9                     62300       3782
+#&gt; 9                21.7                    270500      20116
+#&gt; 10               42.2                    169700       9868
+#&gt;    persons_per_household per_capita_income median_household_income poverty
+#&gt; 1                   2.31             45478                   71304    11.9
+#&gt; 2                   2.33             30720                   50597    20.6
+#&gt; 3                   2.25             22042                   34063    16.1
+#&gt; 4                   2.67             17622                   34025    27.5
+#&gt; 5                   3.09             21587                   50069    12.9
+#&gt; 6                   2.54             24767                   53623    10.5
+#&gt; 7                   2.35             21586                   37058    22.7
+#&gt; 8                   2.38             21020                   38375    20.0
+#&gt; 9                   2.63             35836                   75590     5.5
+#&gt; 10                  3.49             13735                   35461    32.2
+#&gt;    private_nonfarm_establishments private_nonfarm_employment
+#&gt; 1                           30490                     492689
+#&gt; 2                           19210                     562929
+#&gt; 3                               6                          0
+#&gt; 4                             878                      13177
+#&gt; 5                              56                        263
+#&gt; 6                            1028                      11745
+#&gt; 7                            2255                      54809
+#&gt; 8                             134                       1842
+#&gt; 9                            1677                      29760
+#&gt; 10                            780                      14136
+#&gt;    percent_change_private_nonfarm_employment nonemployment_establishments
+#&gt; 1                                      -11.3                        78347
+#&gt; 2                                       -1.4                        41757
+#&gt; 3                                         NA                           48
+#&gt; 4                                      -10.4                         2198
+#&gt; 5                                      -56.9                          217
+#&gt; 6                                        0.9                         3521
+#&gt; 7                                       -4.7                         3556
+#&gt; 8                                       -6.3                          423
+#&gt; 9                                         NA                         4181
+#&gt; 10                                      15.5                         2195
+#&gt;     firms black_owned_firms native_owned_firms asian_owned_firms
+#&gt; 1  105030               2.7                 NA              24.0
+#&gt; 2   55613              11.0                0.7               7.8
+#&gt; 3      39                NA                 NA                NA
+#&gt; 4    3089              25.9                 NA                NA
+#&gt; 5     138                NA                 NA                NA
+#&gt; 6    4754                NA                 NA                NA
+#&gt; 7    4794              11.6                 NA               2.0
+#&gt; 8     622                NA                 NA                NA
+#&gt; 9    6284               1.3                 NA               3.9
+#&gt; 10   2942                NA                 NA                NA
+#&gt;    pac_isl_owned_firms hispanic_owned_firms women_owned_firms
+#&gt; 1                  0.2                  6.6              30.1
+#&gt; 2                  0.1                  8.3              29.5
+#&gt; 3                   NA                   NA                NA
+#&gt; 4                   NA                   NA              28.5
+#&gt; 5                   NA                   NA                NA
+#&gt; 6                   NA                   NA              23.6
+#&gt; 7                   NA                   NA              26.4
+#&gt; 8                   NA                   NA                NA
+#&gt; 9                   NA                  2.0                NA
+#&gt; 10                  NA                   NA              15.2
+#&gt;    manufacturer_shipments_2007 mercent_whole_sales_2007    sales
+#&gt; 1                      2077457                 10562176 12399960
+#&gt; 2                      3703400                  8914822  7565785
+#&gt; 3                            0                        0        0
+#&gt; 4                       639233                       NA   582116
+#&gt; 5                            0                       NA    10079
+#&gt; 6                           NA                   413283   545346
+#&gt; 7                      2801602                   541451  1665130
+#&gt; 8                           NA                       NA   136792
+#&gt; 9                      2255472                       NA  1139808
+#&gt; 10                          NA                   161967   407686
+#&gt;    sales_per_capita accommodation_food_service building_permits fed_spending
+#&gt; 1             15516                    5039171              779     10707798
+#&gt; 2             10381                    3795879              480     16051877
+#&gt; 3                 0                          0                0         8130
+#&gt; 4             13553                      53898               83       408868
+#&gt; 5              3486                         NA                8        39026
+#&gt; 6             11383                      39606              161       415662
+#&gt; 7             23171                     189961              144      1264105
+#&gt; 8             14660                       3228                1        98360
+#&gt; 9             21240                     163445              232       442693
+#&gt; 10            10971                      32041              249       121324
+#&gt;      area density                       geometry
+#&gt; 1   46.87 17179.1 MULTIPOLYGON (((-2283315 35...
+#&gt; 2   58.15 12415.7 MULTIPOLYGON (((2009657 799...
+#&gt; 3  746.11     0.9 MULTIPOLYGON (((-664543.3 4...
+#&gt; 4  253.52   179.2 MULTIPOLYGON (((1544259 321...
+#&gt; 5  923.04     3.3 MULTIPOLYGON (((-546533.1 -...
+#&gt; 6  633.71    75.3 MULTIPOLYGON (((1780210 102...
+#&gt; 7   49.13  1538.2 MULTIPOLYGON (((1458790 122...
+#&gt; 8  617.84    14.6 MULTIPOLYGON (((232307.6 -4...
+#&gt; 9   33.03  1691.9 MULTIPOLYGON (((-775389.1 3...
+#&gt; 10 469.21    80.0 MULTIPOLYGON (((-1272146 82...
+```
+]
+
+---
+count: false
+ 
+
+.panel1-fips-auto[
+
+```r
+library(tidyverse)
+library(sf)
+
+# Claus on github
+fips_geometries &lt;- readRDS(url("https://wilkelab.org/SDS375/datasets/US_counties.rds")) %&gt;%
+  rename(FIPS = GEOID)
+
+US_census &lt;- read_csv("https://wilkelab.org/SDS375/datasets/US_census.csv",
+                      col_types = cols(FIPS = "c")
+          )
+
+# works
+fips_geometries %&gt;%
+  left_join(US_census, by = "FIPS") %&gt;%
+* ggplot()
+```
+]
+ 
+.panel2-fips-auto[
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/fips_auto_08_output-1.png" width="100%" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-fips-auto[
+
+```r
+library(tidyverse)
+library(sf)
+
+# Claus on github
+fips_geometries &lt;- readRDS(url("https://wilkelab.org/SDS375/datasets/US_counties.rds")) %&gt;%
+  rename(FIPS = GEOID)
+
+US_census &lt;- read_csv("https://wilkelab.org/SDS375/datasets/US_census.csv",
+                      col_types = cols(FIPS = "c")
+          )
+
+# works
+fips_geometries %&gt;%
+  left_join(US_census, by = "FIPS") %&gt;%
+  ggplot() +
+* geom_sf(aes(fill = home_ownership))
+```
+]
+ 
+.panel2-fips-auto[
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/fips_auto_09_output-1.png" width="100%" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-fips-auto[
+
+```r
+library(tidyverse)
+library(sf)
+
+# Claus on github
+fips_geometries &lt;- readRDS(url("https://wilkelab.org/SDS375/datasets/US_counties.rds")) %&gt;%
+  rename(FIPS = GEOID)
+
+US_census &lt;- read_csv("https://wilkelab.org/SDS375/datasets/US_census.csv",
+                      col_types = cols(FIPS = "c")
+          )
+
+# works
+fips_geometries %&gt;%
+  left_join(US_census, by = "FIPS") %&gt;%
+  ggplot() +
+  geom_sf(aes(fill = home_ownership)) +
+* scale_fill_viridis_c()
+```
+]
+ 
+.panel2-fips-auto[
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/fips_auto_10_output-1.png" width="100%" /&gt;
+]
+
+&lt;style&gt;
+.panel1-fips-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-fips-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-fips-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+---
+
+
+---
+
 
 - inheriting from geom_sf()
-- 'computing' fips sf geometries column (xy perimeters) based on aes = my_fips_code
+- 'computing' fips sf geometries column (xy perimeters) based on aes(fips = my_fips_code)
 - Wilke example start point
-
 
 https://evamaerey.github.io/mytidytuesday/2023-03-10-ggfips/ggfips_w_sf.html
 
@@ -4917,8 +5484,6 @@ https://evamaerey.github.io/mytidytuesday/2023-03-10-ggfips/ggfips_w_sf.html
 
 
 https://evamaerey.github.io/mytidytuesday/2023-03-12-ggbrain-seg-sf/ggbrain_seg_sf.html
-
-
 
 
 
@@ -4944,7 +5509,7 @@ a +
 #&gt; Warning: Removed 1 row containing missing values (`geom_path()`).
 ```
 
-&lt;img src="circle_pack_and_beyond_talk_files/figure-html/unnamed-chunk-11-1.png" width="100%" /&gt;
+&lt;img src="circle_pack_and_beyond_talk_files/figure-html/unnamed-chunk-12-1.png" width="100%" /&gt;
 
 ```r
 
