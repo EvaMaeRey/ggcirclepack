@@ -1,5 +1,7 @@
 ---
-output: github_document
+output: 
+  github_document:
+    toc: TRUE
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -9,8 +11,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%",
-  cache = TRUE
+  out.width = "100%"
 )
 ```
 
@@ -21,10 +22,24 @@ knitr::opts_chunk$set(
 
 circle pack is an experimental package that uses packcircles to handle circle packing computation. 
 
+### Note to the reader
+
+Your feedback is on this work is greatly appreciated.
+
+Beyond the descriptions of our work, we interject comments on our hesitations 🤔 and areas that need some work 🚧, for your consideration marked with emoji.
+
+Your help and feedback would be greatly appreciated on any of the questions...
+
+- Are functions named intuitively? *'According to IBM studies, intuitive variable naming contributes more to code readability than comments, or for that matter, any other factor' McConnell, S. Code complete*
+- Do functions work as you expect? 
+- Is there rewriting that could make the code more concise?
+- What tests should be performed?
+
 
 # status quo w/o {ggcirclepack}: loads of work before plotting
 
 ```{r}
+library(tidyverse)
 gapminder::gapminder %>%  
   filter(continent == "Americas") %>%  
   filter(year == 2002) %>%  
@@ -57,7 +72,7 @@ circle_outlines %>%
 
 # Proposed UI
 
-```{r example, out.width="33%", fig.show="hold", message=F}
+```{r example, out.width="33%", fig.show="hold", message=F, eval = F}
 library(tidyverse)
 library(ggcirclepack)
 
@@ -65,8 +80,9 @@ gapminder::gapminder %>%
 filter(year == 2002) %>%
   ggplot() +
   aes(id = country, area = pop) +
-  geom_polygon_circlepack(alpha = .5) + 
-  geom_text_circlepack() 
+  geom_circlepack() +               # draws packed circles 
+  geom_circlepack_text() +          # labels at the center
+  coord_fixed(ratio = 1)
 ```
 
 
@@ -74,122 +90,19 @@ filter(year == 2002) %>%
 
 # Package functions
 
+## geom_circlepack_text (center)
 
-## geom_circle_pack
+### Step 1. compute panel
 
-### compute
-
-```{r compute_panel_circle_pack}
-# Step 1
-#' compute_panel_circle_pack
-#'
-#' @param data
-#' @param scales
-#'
-#' @return
-#' @export
-#'
-#' @examples
-#' TBD
-compute_panel_circle_pack <- function(data, scales){
-
-  data %>%
-    mutate(id = row_number()) ->
-    data1
-
-  if(is.null(data$area)){
-
-    data1 %>%
-      mutate(area = 1) ->
-      data1
-
-  }
-
-  data1 %>%
-    pull(area) %>%
-    packcircles::circleProgressiveLayout(
-      sizetype = 'area') %>%
-    packcircles::circleLayoutVertices(npoints = 300) %>%
-    left_join(data1) #%>%
-
-}
-```
-
-### test compute
-
-```{r}
-gapminder::gapminder %>%
-filter(continent == "Americas") %>%
-  filter(year == 2002) %>%
-  # input must have required aesthetic inputs as columns
-  rename(area = pop) %>%
-  compute_panel_circle_pack() %>%
-  head()
-
-```
-
-### ggproto and geom
-
-```{r geom_circle_pack}
-StatCirclepack <- ggplot2::ggproto(`_class` = "StatCirclepack",
-                                  `_inherit` = ggplot2::Stat,
-                                  required_aes = c("id"),
-                                  compute_panel = compute_panel_circle_pack,
-                                  # setup_data = my_setup_data,
-                                  default_aes = ggplot2::aes(group = after_stat(id))
-                                  )
-
-
-#' Title
-#'
-#' @param mapping
-#' @param data
-#' @param position
-#' @param na.rm
-#' @param show.legend
-#' @param inherit.aes
-#' @param ...
+```{r compute_panel_circlepack_center}
+#' compute_panel_circlepack_center
 #'
 #' @return
 #' @export
 #'
 #' @examples
 #' # TBD
-geom_polygon_circlepack <- function(mapping = NULL, data = NULL,
-                           position = "identity", na.rm = FALSE,
-                           show.legend = NA,
-                           inherit.aes = TRUE, ...) {
-  ggplot2::layer(
-    stat = StatCirclepack, # proto object from Step 2
-    geom = ggplot2::GeomPolygon, # inherit other behavior
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, ...)
-  )
-}
-```
-
-### test geom
-
-## geom_text_circlepack
-
-### compute panel
-
-```{r compute_panel_circle_pack_center}
-#' compute_panel_circle_pack
-#'
-#' @param data
-#' @param scales
-#'
-#' @return
-#' @export
-#'
-#' @examples
-#' # TBD
-compute_panel_circle_pack_center <- function(data, scales){
+compute_panel_circlepack_center <- function(data, scales){
 
   data ->
     data1
@@ -212,7 +125,7 @@ compute_panel_circle_pack_center <- function(data, scales){
 }
 ```
 
-### test compute
+### Step 1.1 test compute
 
 ```{r}
 gapminder::gapminder %>%
@@ -220,19 +133,18 @@ filter(continent == "Americas") %>%
   filter(year == 2002) %>%
   # input must have required aesthetic inputs as columns
   select(area = pop, id = country) %>%
-  compute_panel_circle_pack_center() %>%
+  compute_panel_circlepack_center() %>%
   head()
 
 ```
 
-### ggproto and geom
+### Step 2 and 3 ggproto and geom
 
-```{r geom_text_circlepack}
+```{r geom_circlepack_text}
 StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
                                   `_inherit` = ggplot2::Stat,
                                   required_aes = c("id"),
-                                  compute_panel = compute_panel_circle_pack_center,
-                                  # setup_data = my_setup_data,
+                                  compute_panel = compute_panel_circlepack_center,
                                   default_aes = ggplot2::aes(group = after_stat(id),
                                                              size = after_stat(area))
                                   )
@@ -253,7 +165,7 @@ StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
 #'
 #' @examples
 #' # TBD
-geom_text_circlepack <- function(mapping = NULL, data = NULL,
+geom_circlepack_text <- function(mapping = NULL, data = NULL,
                            position = "identity", na.rm = FALSE,
                            show.legend = NA,
                            inherit.aes = TRUE, ...) {
@@ -271,15 +183,127 @@ geom_text_circlepack <- function(mapping = NULL, data = NULL,
 ```
 
 
-### test geom
+### Step 4. test geom
 
 ```{r}
+gapminder::gapminder %>%
+filter(year == 2002) %>%
+  ggplot() +
+  aes(id = country, area = pop) +
+  geom_circlepack_text(alpha = .5) + 
+  coord_equal() + 
+  labs(title = "gapminder 2002 countries")
+```
+
+
+
+
+
+## geom_circlepack
+
+### Step 1. compute_panel
+
+```{r compute_panel_circlepack}
+# Step 1
+#' compute_panel_circlepack
+#'
+#' @param data
+#' @param scales
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' TBD
+compute_panel_circlepack <- function(data, scales){
+
+  data %>%
+    mutate(id = row_number()) ->
+    data1
+
+  if(is.null(data$area)){
+
+    data1 %>%
+      mutate(area = 1) ->
+      data1
+
+  }
+
+  data1 %>%
+    pull(area) %>%
+    packcircles::circleProgressiveLayout(
+      sizetype = 'area') %>%
+    packcircles::circleLayoutVertices(npoints = 50) %>%
+    left_join(data1) #%>%
+
+}
+```
+
+### Step 1.1. test compute
+
+```{r}
+gapminder::gapminder %>%
+filter(continent == "Americas") %>%
+  filter(year == 2002) %>%
+  # input must have required aesthetic inputs as columns
+  rename(area = pop) %>%
+  compute_panel_circlepack() %>%
+  head()
+
+```
+
+### Step 2 & 3 ggproto and geom
+
+```{r geom_circlepack}
+StatCirclepack <- ggplot2::ggproto(`_class` = "StatCirclepack",
+                                  `_inherit` = ggplot2::Stat,
+                                  required_aes = c("id"),
+                                  compute_panel = compute_panel_circlepack,
+                                  default_aes = ggplot2::aes(group = after_stat(id))
+                                  )
+
+#' Title
+#'
+#' @param mapping
+#' @param data
+#' @param position
+#' @param na.rm
+#' @param show.legend
+#' @param inherit.aes
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' # TBD
+geom_circlepack <- function(mapping = NULL, data = NULL,
+                           position = "identity", na.rm = FALSE,
+                           show.legend = NA,
+                           inherit.aes = TRUE, ...) {
+  ggplot2::layer(
+    stat = StatCirclepack, # proto object from Step 2
+    geom = ggplot2::GeomPolygon, # inherit other behavior
+    data = data,
+    mapping = mapping,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(na.rm = na.rm, ...)
+  )
+}
+```
+
+### Step 4. test geom
+
+```{r}
+
 
 gapminder::gapminder %>%
 filter(year == 2002) %>%
   ggplot() +
   aes(id = country) +
-  geom_polygon_circlepack(alpha = .5) + 
+  geom_circlepack(alpha = .5) + 
   coord_equal() + 
   labs(title = "gapminder 2002 countries")
 
@@ -289,7 +313,7 @@ last_plot() +
 
 last_plot() +
   aes(area = pop) + 
-  geom_text_circlepack() + 
+  geom_circlepack_text() + 
   labs(title = "with very different populations")
 
 last_plot() +
@@ -314,27 +338,30 @@ gapminder::gapminder %>%
 filter(year == 2002) %>%
   ggplot() +
   aes(id = country) +
-  geom_polygon_circlepack(alpha = .5) + 
+  geom_circlepack(alpha = .5) + 
   coord_equal() +
   aes(area = pop) + 
-  geom_text_circlepack(aes(label = after_stat(
+  geom_circlepack_text(aes(label = after_stat(
     paste(id, "\n",
     round(area/1000000, 1), "mil."))), lineheight = .8)
 ```
 
 
+# Package the functions
 
 ```{r}
-readme2pkg::chunk_to_r(chunk_name = "compute_panel_circle_pack")
-readme2pkg::chunk_to_r(chunk_name = "geom_circle_pack")
-readme2pkg::chunk_to_r(chunk_name = "compute_panel_circle_pack_center")
-readme2pkg::chunk_to_r(chunk_name = "geom_text_circlepack")
+readme2pkg::chunk_to_r(chunk_name = "compute_panel_circlepack")
+readme2pkg::chunk_to_r(chunk_name = "geom_circlepack")
+readme2pkg::chunk_to_r(chunk_name = "compute_panel_circlepack_center")
+readme2pkg::chunk_to_r(chunk_name = "geom_circlepack_text")
 ```
 
 
-## Issues
+# Issues
 
-Wish list for ggcirclepack:  More computation under the hood for a count data case.  
+Wish list for ggcirclepack: 
+
+## More computation under the hood for a count data case.  
 
 ```{r}
 tidytitanic::tidy_titanic %>% 
@@ -344,14 +371,15 @@ tidytitanic::tidy_titanic %>%
 ```{}
 tidytitanic::tidy_titanic() + 
   ggplot() + 
-  aes(x = "all") + 
-  geom_polygon_circlepack(alpha = .5) + 
-  geom_text_circlepack(aes(label = afterstat(count))) + # automatically labels with count
+  aes(id = "all") + 
+  geom_circlepack(alpha = .5) + 
+  geom_circlepack_text(aes(label = afterstat(count))) + # automatically labels with count
   aes(linetype = sex) + 
   aes(color = age) + 
   aes(alpha = survived) + 
   facet_wrap(~class)
 ```
 
-Quiet the joins.
+## Quiet the joins.
+## create a ggcirclepack()/defaults_circlepack() function for preferred defaults.
 
