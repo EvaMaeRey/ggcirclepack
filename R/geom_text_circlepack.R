@@ -1,9 +1,10 @@
-StatCirclepack <- ggplot2::ggproto(`_class` = "StatCirclepack",
+StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
                                   `_inherit` = ggplot2::Stat,
                                   required_aes = c("id"),
-                                  compute_panel = compute_panel_circle_pack,
+                                  compute_panel = compute_panel_circle_pack_center,
                                   # setup_data = my_setup_data,
-                                  default_aes = ggplot2::aes(group = after_stat(id))
+                                  default_aes = ggplot2::aes(group = after_stat(id),
+                                                             size = after_stat(area))
                                   )
 
 
@@ -22,13 +23,13 @@ StatCirclepack <- ggplot2::ggproto(`_class` = "StatCirclepack",
 #'
 #' @examples
 #' # TBD
-geom_polygon_circlepack <- function(mapping = NULL, data = NULL,
+geom_text_circlepack <- function(mapping = NULL, data = NULL,
                            position = "identity", na.rm = FALSE,
                            show.legend = NA,
                            inherit.aes = TRUE, ...) {
   ggplot2::layer(
-    stat = StatCirclepack, # proto object from Step 2
-    geom = ggplot2::GeomPolygon, # inherit other behavior
+    stat = StatCirclepackcenter, # proto object from Step 2
+    geom = ggplot2::GeomText, # inherit other behavior
     data = data,
     mapping = mapping,
     position = position,

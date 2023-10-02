@@ -16,96 +16,59 @@ circle packing computation.
 gapminder::gapminder %>%  
   filter(continent == "Americas") %>%  
   filter(year == 2002) %>%  
-  select(country, pop) ->  
-prep  
+  select(country, pop) %>% 
+  mutate(id = row_number()) ->  
+df_w_id
 
-packcircles::circleProgressiveLayout(prep$pop,  
+packcircles::circleProgressiveLayout(df_w_id$pop,  
                                          sizetype = 'area') ->  
-pack  
+x0y0radius  
 
-pack %>%  
+x0y0radius %>%  
   packcircles::circleLayoutVertices(npoints = 50) ->  
 circle_outlines  
 
-circle_outlines %>%  
+circle_outlines %>% 
+  left_join(df_w_id) %>% 
   ggplot() +  
   aes(x = x, y = y) +  
   geom_polygon(colour = "black", alpha = 0.6) +  
   aes(group = id) +  
-  aes(fill = factor(id)) +  
-  geom_text(data = cbind(prep, pack),  
+  aes(fill = pop) +  
+  geom_text(data = cbind(df_w_id, x0y0radius),  
             aes(x, y, size = pop, label = country,  
                 group = NULL, fill = NULL)) +  
   theme(legend.position = "none") +  
   coord_equal()
+#> Joining with `by = join_by(id)`
 ```
 
 <img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
 
-## Proposed UI and current behavior
+# Proposed UI
 
 ``` r
-library(ggcirclepack)
 library(tidyverse)
+library(ggcirclepack)
 
 gapminder::gapminder %>%
 filter(year == 2002) %>%
   ggplot() +
-  aes(id = country) +
+  aes(id = country, area = pop) +
   geom_polygon_circlepack(alpha = .5) + 
-  coord_equal() + 
-  labs(title = "gapminder 2002 countries")
-
-last_plot() +
-  aes(fill = continent) + 
-  labs(title = "from 5 continents")
-
-last_plot() +
-  aes(area = pop) + 
-  geom_text_circlepack() + 
-  labs(title = "with very different populations")
-
-last_plot() +
-  facet_wrap(facets = vars(continent)) + 
-  labs(title = "faceting")
-
-last_plot() + 
-  scale_size_continuous(range = c(0, 4)) + 
-  theme(legend.position = "none") + 
-  labs(title = "remove legends")
-
-last_plot() + 
-  aes(area = gdpPercap*pop) + 
-  labs(title = "and very different GDPs")
-
-last_plot() + 
-  aes(area = gdpPercap) + 
-  labs(title = "and per capita GDPs")
+  geom_text_circlepack() 
 ```
 
-<img src="man/figures/README-example-1.png" width="33%" /><img src="man/figures/README-example-2.png" width="33%" /><img src="man/figures/README-example-3.png" width="33%" /><img src="man/figures/README-example-4.png" width="33%" /><img src="man/figures/README-example-5.png" width="33%" /><img src="man/figures/README-example-6.png" width="33%" /><img src="man/figures/README-example-7.png" width="33%" />
-
-``` r
-gapminder::gapminder %>%
-filter(year == 2002) %>%
-  ggplot() +
-  aes(id = country) +
-  geom_polygon_circlepack(alpha = .5) + 
-  coord_equal() +
-  aes(area = pop) + 
-  geom_text_circlepack(aes(label = after_stat(
-    paste(id, "\n",
-    round(area/1000000, 1), "mil."))), lineheight = .8)
-#> Joining with `by = join_by(id)`
-```
-
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+<img src="man/figures/README-example-1.png" width="33%" />
 
 # Package functions
 
 ## geom\_circle\_pack
 
+### compute
+
 ``` r
+# Step 1
 #' compute_panel_circle_pack
 #'
 #' @param data
@@ -115,26 +78,7 @@ filter(year == 2002) %>%
 #' @export
 #'
 #' @examples
-#' library(ggplot2)
-#' library(magrittr)
-#' library(dplyr)
-#' gapminder::gapminder %>%
-#' filter(continent == "Americas") %>%
-#'   filter(year == 2002) %>%
-#'   # input must have required aesthetic inputs as columns
-#'   rename(area = pop) %>%
-#'   compute_panel_circle_pack() %>%
-#'   head()
-#'
-#'   gapminder::gapminder %>%
-#' filter(continent == "Americas") %>%
-#'  filter(year == 2002) %>%
-#'  # input must have required aesthetic inputs as columns
-#'  rename(area = pop) %>%
-#'  compute_panel_circle_pack() %>%
-#'  ggplot() +
-#'  aes(x = x, y = y, fill = country) +
-#'  geom_polygon()
+#' TBD
 compute_panel_circle_pack <- function(data, scales){
 
   data %>%
@@ -157,8 +101,31 @@ compute_panel_circle_pack <- function(data, scales){
     left_join(data1) #%>%
 
 }
+```
 
+### test compute
 
+``` r
+gapminder::gapminder %>%
+filter(continent == "Americas") %>%
+  filter(year == 2002) %>%
+  # input must have required aesthetic inputs as columns
+  rename(area = pop) %>%
+  compute_panel_circle_pack() %>%
+  head()
+#> Joining with `by = join_by(id)`
+#>             x         y id   country continent year lifeExp     area gdpPercap
+#> 1   0.0000000   0.00000  1 Argentina  Americas 2002   74.34 38331121  8797.641
+#> 2  -0.7660766  73.15225  1 Argentina  Americas 2002   74.34 38331121  8797.641
+#> 3  -3.0639703 146.27241  1 Argentina  Americas 2002   74.34 38331121  8797.641
+#> 4  -6.8926731 219.32842  1 Argentina  Americas 2002   74.34 38331121  8797.641
+#> 5 -12.2505058 292.28821  1 Argentina  Americas 2002   74.34 38331121  8797.641
+#> 6 -19.1351181 365.11980  1 Argentina  Americas 2002   74.34 38331121  8797.641
+```
+
+### ggproto and geom
+
+``` r
 StatCirclepack <- ggplot2::ggproto(`_class` = "StatCirclepack",
                                   `_inherit` = ggplot2::Stat,
                                   required_aes = c("id"),
@@ -182,24 +149,7 @@ StatCirclepack <- ggplot2::ggproto(`_class` = "StatCirclepack",
 #' @export
 #'
 #' @examples
-#' library(ggplot2)
-#' library(magrittr)
-#' library(dplyr)
-#' gapminder::gapminder %>%
-#' filter(year == 2002) %>%
-#'   ggplot() +
-#'   aes(id = country) +
-#'   geom_polygon_circlepack(alpha = .5, size = .002)
-#'
-#' last_plot() +
-#'   aes(fill = continent)
-#'
-#' last_plot() +
-#'   aes(area = pop)
-#'
-#' last_plot() +
-#'   aes(color = continent) +
-#'   facet_wrap(facets = vars(continent))
+#' # TBD
 geom_polygon_circlepack <- function(mapping = NULL, data = NULL,
                            position = "identity", na.rm = FALSE,
                            show.legend = NA,
@@ -217,7 +167,11 @@ geom_polygon_circlepack <- function(mapping = NULL, data = NULL,
 }
 ```
 
+### test geom
+
 ## geom\_text\_circlepack
+
+### compute panel
 
 ``` r
 #' compute_panel_circle_pack
@@ -229,26 +183,7 @@ geom_polygon_circlepack <- function(mapping = NULL, data = NULL,
 #' @export
 #'
 #' @examples
-#' library(ggplot2)
-#' library(magrittr)
-#' library(dplyr)
-#' gapminder::gapminder %>%
-#' filter(continent == "Americas") %>%
-#'   filter(year == 2002) %>%
-#'   # input must have required aesthetic inputs as columns
-#'   rename(area = pop) %>%
-#'   compute_panel_circle_pack() %>%
-#'   head()
-#'
-#'  gapminder::gapminder %>%
-#'    filter(continent == "Americas") %>%
-#'  filter(year == 2002) %>%
-#'  # input must have required aesthetic inputs as columns
-#'  rename(area = pop) %>%
-#'  compute_panel_circle_pack() %>%
-#'  ggplot() +
-#'  aes(x = x, y = y, fill = country) +
-#'  geom_polygon()
+#' # TBD
 compute_panel_circle_pack_center <- function(data, scales){
 
   data ->
@@ -270,10 +205,30 @@ compute_panel_circle_pack_center <- function(data, scales){
     mutate(label = id)
 
 }
+```
 
+### test compute
 
+``` r
+gapminder::gapminder %>%
+filter(continent == "Americas") %>%
+  filter(year == 2002) %>%
+  # input must have required aesthetic inputs as columns
+  select(area = pop, id = country) %>%
+  compute_panel_circle_pack_center() %>%
+  head()
+#>           x         y   radius      area        id     label
+#> 1 -3493.018     0.000 3493.018  38331121 Argentina Argentina
+#> 2  1639.564     0.000 1639.564   8445134   Bolivia   Bolivia
+#> 3  2732.774 -9142.026 7567.594 179914212    Brazil    Brazil
+#> 4  1150.752  4801.407 3186.661  31902268    Canada    Canada
+#> 5  5273.817  1302.381 2221.005  15497046     Chile     Chile
+#> 6 10562.330 -1160.651 3612.938  41008227  Colombia  Colombia
+```
 
+### ggproto and geom
 
+``` r
 StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
                                   `_inherit` = ggplot2::Stat,
                                   required_aes = c("id"),
@@ -298,23 +253,7 @@ StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
 #' @export
 #'
 #' @examples
-#' library(ggplot2)
-#' library(magrittr)
-#' library(dplyr)
-#' gapminder::gapminder %>%
-#' filter(year == 2002) %>%
-#'   ggplot() +
-#'   aes(id = country) +
-#'   geom_text_circlepack(alpha = .5)
-#'
-#' last_plot() +
-#'   aes(fill = continent)
-#'
-#' last_plot() +
-#'   aes(area = pop)
-#'
-#' last_plot() +
-#'   facet_wrap(facets = vars(continent))
+#' # TBD
 geom_text_circlepack <- function(mapping = NULL, data = NULL,
                            position = "identity", na.rm = FALSE,
                            show.legend = NA,
@@ -332,11 +271,126 @@ geom_text_circlepack <- function(mapping = NULL, data = NULL,
 }
 ```
 
+### test geom
+
 ``` r
-readme2pkg::chunk_to_r(c("geom_circle_pack","geom_circle_pack_text"))
+
+gapminder::gapminder %>%
+filter(year == 2002) %>%
+  ggplot() +
+  aes(id = country) +
+  geom_polygon_circlepack(alpha = .5) + 
+  coord_equal() + 
+  labs(title = "gapminder 2002 countries")
+#> Joining with `by = join_by(id)`
 ```
 
-### Issues
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+
+``` r
+
+last_plot() +
+  aes(fill = continent) + 
+  labs(title = "from 5 continents")
+#> Joining with `by = join_by(id)`
+```
+
+<img src="man/figures/README-unnamed-chunk-5-2.png" width="100%" />
+
+``` r
+
+last_plot() +
+  aes(area = pop) + 
+  geom_text_circlepack() + 
+  labs(title = "with very different populations")
+#> Joining with `by = join_by(id)`
+```
+
+<img src="man/figures/README-unnamed-chunk-5-3.png" width="100%" />
+
+``` r
+
+last_plot() +
+  facet_wrap(facets = vars(continent)) + 
+  labs(title = "faceting")
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+```
+
+<img src="man/figures/README-unnamed-chunk-5-4.png" width="100%" />
+
+``` r
+
+last_plot() + 
+  scale_size_continuous(range = c(0, 4)) + 
+  theme(legend.position = "none") + 
+  labs(title = "remove legends")
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+```
+
+<img src="man/figures/README-unnamed-chunk-5-5.png" width="100%" />
+
+``` r
+
+last_plot() + 
+  aes(area = gdpPercap*pop) + 
+  labs(title = "and very different GDPs")
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+```
+
+<img src="man/figures/README-unnamed-chunk-5-6.png" width="100%" />
+
+``` r
+
+last_plot() + 
+  aes(area = gdpPercap) + 
+  labs(title = "and per capita GDPs")
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+#> Joining with `by = join_by(id)`
+```
+
+<img src="man/figures/README-unnamed-chunk-5-7.png" width="100%" />
+
+``` r
+
+
+gapminder::gapminder %>%
+filter(year == 2002) %>%
+  ggplot() +
+  aes(id = country) +
+  geom_polygon_circlepack(alpha = .5) + 
+  coord_equal() +
+  aes(area = pop) + 
+  geom_text_circlepack(aes(label = after_stat(
+    paste(id, "\n",
+    round(area/1000000, 1), "mil."))), lineheight = .8)
+#> Joining with `by = join_by(id)`
+```
+
+<img src="man/figures/README-unnamed-chunk-5-8.png" width="100%" />
+
+``` r
+readme2pkg::chunk_to_r(chunk_name = "compute_panel_circle_pack")
+readme2pkg::chunk_to_r(chunk_name = "geom_circle_pack")
+readme2pkg::chunk_to_r(chunk_name = "compute_panel_circle_pack_center")
+readme2pkg::chunk_to_r(chunk_name = "geom_text_circlepack")
+```
+
+## Issues
 
 Wish list for ggcirclepack: More computation under the hood for a count
 data case.
@@ -362,3 +416,5 @@ tidytitanic::tidy_titanic %>%
       aes(color = age) + 
       aes(alpha = survived) + 
       facet_wrap(~class)
+
+Quiet the joins.
