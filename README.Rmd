@@ -102,11 +102,8 @@ filter(year == 2002) %>%
 #'
 #' @examples
 #' # TBD
-compute_panel_circlepack_center <- function(data, scales, count = F){
+compute_panel_circlepack_center <- function(data, scales){
 
-  # data ->
-  #   data1
-  
   # get aes names as they appear in the data
   data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 
                                              "colour", "group", "linewidth", 
@@ -117,30 +114,18 @@ compute_panel_circlepack_center <- function(data, scales, count = F){
   data %>% 
     group_by(across(data_mapped_aes_names)) ->
   data
-   # if(!("weight" %in% names(data))){data$weight <- 1}
-  # order matters... Need to add text aesthetics
-  # if("id" %in% names(data)){data <- group_by(data, id, .add = T)}
-  # if("fill" %in% names(data)){data <- group_by(data, fill, .add = T)}
-  # if("alpha" %in% names(data)){data <- group_by(data, alpha, .add = T)}
-  # if("colour" %in% names(data)){data <- group_by(data, colour, .add = T)}
-  # if("group" %in% names(data)){data <- group_by(data, group, .add = T)}
-  # if("linetype" %in% names(data)){data <- group_by(data, linetype, .add = T)}
-  # if("linewidth" %in% names(data)){data <- group_by(data, linewidth, .add = T)}
   
-  
-  if(count){
   data %>% 
     count(wt = area) %>% 
+    arrange(id) %>% # this doesn't feel very principled
     rename(area = n) ->
-    data
-  }
+  data
 
   data %>%
     pull(area) %>%
     packcircles::circleProgressiveLayout(
       sizetype = 'area') %>%
-    cbind(data) %>%
-    mutate(label = id)
+    cbind(data) 
 
 }
 ```
@@ -159,7 +144,7 @@ filter(continent == "Americas") %>%
 gapminder::gapminder %>% 
   filter(year == 2002) %>% 
   select(id = continent) %>% 
-  compute_panel_circlepack_center(count = T)
+  compute_panel_circlepack_center()
 
 ```
 
@@ -171,7 +156,8 @@ StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
                                   required_aes = c("id"),
                                   compute_panel = compute_panel_circlepack_center,
                                   default_aes = ggplot2::aes(group = after_stat(id),
-                                                             size = after_stat(area))
+                                                             size = after_stat(area),
+                                                             label = after_stat(id))
                                   )
 
 
@@ -240,7 +226,7 @@ filter(year == 2002) %>%
 #'
 #' @examples
 #' TBD
-compute_panel_circlepack <- function(data, scales, count = F){
+compute_panel_circlepack <- function(data, scales){
 
   data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 
                                              "colour", "group", "linewidth", 
@@ -252,37 +238,13 @@ compute_panel_circlepack <- function(data, scales, count = F){
     group_by(across(data_mapped_aes_names)) ->
   data 
   
-   # if(!("weight" %in% names(data))){data$weight <- 1}
-  # order matters... Need to add text aesthetics
-  # if("id" %in% names(data)){data <- group_by(data, id, .add = T)}
-  # 
-  # if("fill" %in% names(data)){data <- group_by(data, fill, .add = T)}
-  # if("alpha" %in% names(data)){data <- group_by(data, alpha, .add = T)}
-  # if("colour" %in% names(data)){data <- group_by(data, colour, .add = T)}
-  # if("group" %in% names(data)){data <- group_by(data, group, .add = T)}
-  # if("linetype" %in% names(data)){data <- group_by(data, linetype, .add = T)}
-  # if("linewidth" %in% names(data)){data <- group_by(data, linewidth, .add = T)}
-  # 
-  if(count){
   data %>% 
-    mutate(id = as.integer(as.factor(id))) %>% 
     count(wt = area) %>% 
+    arrange(id) %>%  # this doesn't feel very principled
     rename(area = n) ->
-    data
-  } else { data$id = 1:nrow(data)}
-  
-  data$id = 1:nrow(data)
-  # data %>%
-  #   mutate(id = row_number()) ->
-  #   data1
+  data
 
-  # if(is.null(data$area)){
-  # 
-  #   data1 %>%
-  #     mutate(area = 1) ->
-  #     data1
-  # 
-  # }
+  data$id = 1:nrow(data)
 
   data %>%
     pull(area) %>%
@@ -359,6 +321,7 @@ filter(year == 2002) %>%
   ggplot() +
   aes(id = country) +
   geom_circlepack(alpha = .5) + 
+  geom_circlepack_text() +
   coord_equal() + 
   labs(title = "gapminder 2002 countries")
 
@@ -405,8 +368,8 @@ gapminder::gapminder %>%
 filter(year == 2002) %>%
   ggplot() +
   aes(id = continent) + 
-  geom_circlepack(count = T) +
-  geom_circlepack_text(alpha = .5, count = T) + 
+  geom_circlepack() +
+  geom_circlepack_text(alpha = .5) + 
   coord_equal() +
   aes(fill = continent)
 

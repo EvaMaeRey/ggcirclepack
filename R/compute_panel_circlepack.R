@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' TBD
-compute_panel_circlepack <- function(data, scales, count = F){
+compute_panel_circlepack <- function(data, scales){
 
   data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 
                                              "colour", "group", "linewidth", 
@@ -21,37 +21,13 @@ compute_panel_circlepack <- function(data, scales, count = F){
     group_by(across(data_mapped_aes_names)) ->
   data 
   
-   # if(!("weight" %in% names(data))){data$weight <- 1}
-  # order matters... Need to add text aesthetics
-  # if("id" %in% names(data)){data <- group_by(data, id, .add = T)}
-  # 
-  # if("fill" %in% names(data)){data <- group_by(data, fill, .add = T)}
-  # if("alpha" %in% names(data)){data <- group_by(data, alpha, .add = T)}
-  # if("colour" %in% names(data)){data <- group_by(data, colour, .add = T)}
-  # if("group" %in% names(data)){data <- group_by(data, group, .add = T)}
-  # if("linetype" %in% names(data)){data <- group_by(data, linetype, .add = T)}
-  # if("linewidth" %in% names(data)){data <- group_by(data, linewidth, .add = T)}
-  # 
-  if(count){
   data %>% 
-    mutate(id = as.integer(as.factor(id))) %>% 
     count(wt = area) %>% 
+    arrange(id) %>%  # this doesn't feel very principled
     rename(area = n) ->
-    data
-  } else { data$id = 1:nrow(data)}
-  
-  data$id = 1:nrow(data)
-  # data %>%
-  #   mutate(id = row_number()) ->
-  #   data1
+  data
 
-  # if(is.null(data$area)){
-  # 
-  #   data1 %>%
-  #     mutate(area = 1) ->
-  #     data1
-  # 
-  # }
+  data$id = 1:nrow(data)
 
   data %>%
     pull(area) %>%
