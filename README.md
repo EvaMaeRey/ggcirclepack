@@ -991,6 +991,14 @@ last_plot() +
 
 ``` r
 
+layer_data(i = 2)
+#>      fill size label group PANEL  id         x y   radius area colour angle
+#> 1 #F8766D    6  1731   all     1 all -23.47327 0 23.47327 1731  black     0
+#> 2 #00BFC4    1   470   all     1 all  12.23134 0 12.23134  470  black     0
+#>   hjust vjust alpha family fontface lineheight
+#> 1   0.5   0.5    NA               1        1.2
+#> 2   0.5   0.5    NA               1        1.2
+
 last_plot() + 
   aes(alpha = age) 
 #> Warning: Using alpha for a discrete variable is not advised.
@@ -999,6 +1007,20 @@ last_plot() +
 <img src="man/figures/README-unnamed-chunk-10-3.png" width="100%" />
 
 ``` r
+
+layer_data(i = 2)
+#> Warning: Using alpha for a discrete variable is not advised.
+#>      fill alpha     size label group PANEL  id         x         y    radius
+#> 1 #F8766D   0.1 1.541155    64   all     1 all -4.513517   0.00000  4.513517
+#> 2 #00BFC4   0.1 1.000000    45   all     1 all  3.784699   0.00000  3.784699
+#> 3 #F8766D   1.0 6.000000  1667   all     1 all  2.023146 -26.76203 23.035246
+#> 4 #00BFC4   1.0 3.420117   425   all     1 all  1.021536  15.16611 11.631066
+#>   area colour angle hjust vjust family fontface lineheight
+#> 1   64  black     0   0.5   0.5               1        1.2
+#> 2   45  black     0   0.5   0.5               1        1.2
+#> 3 1667  black     0   0.5   0.5               1        1.2
+#> 4  425  black     0   0.5   0.5               1        1.2
+
 
 last_plot() + 
   aes(alpha = survived) 
@@ -1015,6 +1037,66 @@ last_plot() +
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-5.png" width="100%" />
+
+``` r
+
+layer_data(i = 2)
+#> Warning: Using alpha for a discrete variable is not advised.
+#>       fill alpha     size label group PANEL  id          x          y    radius
+#> 1  #F8766D   0.1 3.076137   118   all     1 all  -6.128668   0.000000  6.128668
+#> 2  #00BFC4   0.1 1.193601     4   all     1 all   1.128379   0.000000  1.128379
+#> 3  #F8766D   1.0 2.487076    62   all     1 all   3.060949  -5.224857  4.442433
+#> 4  #00BFC4   1.0 3.274294   141   all     1 all   4.616042   7.007854  6.699380
+#> 5  #F8766D   0.1 3.379006   154   all     2 all  -7.001409   0.000000  7.001409
+#> 6  #00BFC4   0.1 1.612219    13   all     2 all   2.034214   0.000000  2.034214
+#> 7  #F8766D   1.0 1.908068    25   all     2 all   1.550773  -4.831034  2.820948
+#> 8  #00BFC4   1.0 2.836658    93   all     2 all   2.991022   7.413573  5.440847
+#> 9  #F8766D   0.1 4.962909   422   all     3 all -11.589943   0.000000 11.589943
+#> 10 #00BFC4   0.1 2.964833   106   all     3 all   5.808687   0.000000  5.808687
+#> 11 #F8766D   1.0 2.784911    88   all     3 all   1.758626 -10.336095  5.292567
+#> 12 #00BFC4   1.0 2.805788    90   all     3 all   1.778498  10.408017  5.352372
+#> 13 #F8766D   0.1 6.000000   670   all     4 all -14.603685   0.000000 14.603685
+#> 14 #00BFC4   0.1 1.000000     3   all     4 all   0.977205   0.000000  0.977205
+#> 15 #F8766D   1.0 3.661571   192   all     4 all   6.837024  -6.558340  7.817640
+#> 16 #00BFC4   1.0 1.798236    20   all     4 all   2.206640   3.277324  2.523133
+#>    area colour angle hjust vjust family fontface lineheight
+#> 1   118  black     0   0.5   0.5               1        1.2
+#> 2     4  black     0   0.5   0.5               1        1.2
+#> 3    62  black     0   0.5   0.5               1        1.2
+#> 4   141  black     0   0.5   0.5               1        1.2
+#> 5   154  black     0   0.5   0.5               1        1.2
+#> 6    13  black     0   0.5   0.5               1        1.2
+#> 7    25  black     0   0.5   0.5               1        1.2
+#> 8    93  black     0   0.5   0.5               1        1.2
+#> 9   422  black     0   0.5   0.5               1        1.2
+#> 10  106  black     0   0.5   0.5               1        1.2
+#> 11   88  black     0   0.5   0.5               1        1.2
+#> 12   90  black     0   0.5   0.5               1        1.2
+#> 13  670  black     0   0.5   0.5               1        1.2
+#> 14    3  black     0   0.5   0.5               1        1.2
+#> 15  192  black     0   0.5   0.5               1        1.2
+#> 16   20  black     0   0.5   0.5               1        1.2
+
+tidytitanic::tidy_titanic %>% 
+  count(sex, survived, class)
+#>       sex survived class   n
+#> 1    Male       No   1st 118
+#> 2    Male       No   2nd 154
+#> 3    Male       No   3rd 422
+#> 4    Male       No  Crew 670
+#> 5    Male      Yes   1st  62
+#> 6    Male      Yes   2nd  25
+#> 7    Male      Yes   3rd  88
+#> 8    Male      Yes  Crew 192
+#> 9  Female       No   1st   4
+#> 10 Female       No   2nd  13
+#> 11 Female       No   3rd 106
+#> 12 Female       No  Crew   3
+#> 13 Female      Yes   1st 141
+#> 14 Female      Yes   2nd  93
+#> 15 Female      Yes   3rd  90
+#> 16 Female      Yes  Crew  20
+```
 
 ## Quiet the joins.
 

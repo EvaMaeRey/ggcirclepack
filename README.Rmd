@@ -268,7 +268,6 @@ filter(continent == "Americas") %>%
   rename(id = country, area = pop) %>%
   compute_panel_circlepack() %>%
   head()
-
 ```
 
 ### Step 2 & 3 ggproto and geom
@@ -428,14 +427,24 @@ tidytitanic::tidy_titanic %>%
 last_plot() +
   aes(fill = sex) 
 
+layer_data(i = 2)
+
 last_plot() + 
   aes(alpha = age) 
+
+layer_data(i = 2)
+
 
 last_plot() + 
   aes(alpha = survived) 
 
 last_plot() + 
   facet_wrap(~class)
+
+layer_data(i = 2)
+
+tidytitanic::tidy_titanic %>% 
+  count(sex, survived, class)
 ```
 
 ## Quiet the joins.
