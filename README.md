@@ -146,7 +146,8 @@ compute_panel_circlepack_center <- function(data, scales){
   
   data %>% 
     count(wt = area) %>% 
-    arrange(id) %>% # this doesn't feel very principled
+    ungroup() %>% 
+    # arrange(id) %>% # this doesn't feel very principled
     rename(area = n) ->
   data
 
@@ -291,7 +292,8 @@ compute_panel_circlepack <- function(data, scales){
   
   data %>% 
     count(wt = area) %>% 
-    arrange(id) %>%  # this doesn't feel very principled
+    ungroup() %>% 
+    # arrange(id) %>%  # this doesn't feel very principled
     rename(area = n) ->
   data
 
@@ -962,15 +964,57 @@ tidytitanic::tidy_titanic %>%
   head()
 ```
 
-    tidytitanic::tidy_titanic() + 
-      ggplot() + 
-      aes(id = "all") + 
-      geom_circlepack(alpha = .5) + 
-      geom_circlepack_text(aes(label = afterstat(count))) + # automatically labels with count
-      aes(linetype = sex) + 
-      aes(color = age) + 
-      aes(alpha = survived) + 
-      facet_wrap(~class)
+``` r
+tidytitanic::tidy_titanic %>% 
+  ggplot() + 
+  aes(id = "all") + 
+  geom_circlepack(alpha = .5) +
+  geom_circlepack_text(aes(label = after_stat(area))) +
+  coord_equal()
+#> Warning in geom_circlepack(alpha = 0.5): All aesthetics have length 1, but the data has 2201 rows.
+#> ℹ Please consider using `annotate()` or provide this layer with data containing
+#>   a single row.
+#> Warning in geom_circlepack_text(aes(label = after_stat(area))): All aesthetics have length 1, but the data has 2201 rows.
+#> ℹ Please consider using `annotate()` or provide this layer with data containing
+#>   a single row.
+```
+
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+
+``` r
+
+last_plot() +
+  aes(fill = sex) 
+```
+
+<img src="man/figures/README-unnamed-chunk-10-2.png" width="100%" />
+
+``` r
+
+last_plot() + 
+  aes(alpha = age) 
+#> Warning: Using alpha for a discrete variable is not advised.
+```
+
+<img src="man/figures/README-unnamed-chunk-10-3.png" width="100%" />
+
+``` r
+
+last_plot() + 
+  aes(alpha = survived) 
+#> Warning: Using alpha for a discrete variable is not advised.
+```
+
+<img src="man/figures/README-unnamed-chunk-10-4.png" width="100%" />
+
+``` r
+
+last_plot() + 
+  facet_wrap(~class)
+#> Warning: Using alpha for a discrete variable is not advised.
+```
+
+<img src="man/figures/README-unnamed-chunk-10-5.png" width="100%" />
 
 ## Quiet the joins.
 

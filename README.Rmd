@@ -117,7 +117,8 @@ compute_panel_circlepack_center <- function(data, scales){
   
   data %>% 
     count(wt = area) %>% 
-    arrange(id) %>% # this doesn't feel very principled
+    ungroup() %>% 
+    # arrange(id) %>% # this doesn't feel very principled
     rename(area = n) ->
   data
 
@@ -240,7 +241,8 @@ compute_panel_circlepack <- function(data, scales){
   
   data %>% 
     count(wt = area) %>% 
-    arrange(id) %>%  # this doesn't feel very principled
+    ungroup() %>% 
+    # arrange(id) %>%  # this doesn't feel very principled
     rename(area = n) ->
   data
 
@@ -415,15 +417,24 @@ tidytitanic::tidy_titanic %>%
   head()
 ```
 
-```{}
-tidytitanic::tidy_titanic() + 
+```{r}
+tidytitanic::tidy_titanic %>% 
   ggplot() + 
   aes(id = "all") + 
-  geom_circlepack(alpha = .5) + 
-  geom_circlepack_text(aes(label = afterstat(count))) + # automatically labels with count
-  aes(linetype = sex) + 
-  aes(color = age) + 
-  aes(alpha = survived) + 
+  geom_circlepack(alpha = .5) +
+  geom_circlepack_text(aes(label = after_stat(area))) +
+  coord_equal()
+
+last_plot() +
+  aes(fill = sex) 
+
+last_plot() + 
+  aes(alpha = age) 
+
+last_plot() + 
+  aes(alpha = survived) 
+
+last_plot() + 
   facet_wrap(~class)
 ```
 

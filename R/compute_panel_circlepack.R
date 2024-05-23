@@ -23,7 +23,8 @@ compute_panel_circlepack <- function(data, scales){
   
   data %>% 
     count(wt = area) %>% 
-    arrange(id) %>%  # this doesn't feel very principled
+    ungroup() %>% 
+    # arrange(id) %>%  # this doesn't feel very principled
     rename(area = n) ->
   data
 
