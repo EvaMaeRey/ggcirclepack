@@ -136,19 +136,25 @@ compute_panel_circlepack_center <- function(data, scales, count = F){
   # data ->
   #   data1
   
-  
+  # get aes names as they appear in the data
+  data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 
+                                             "colour", "group", "linewidth", 
+                                             "linetype")]
   
   if(is.null(data$area)){data$area <- 1}
   
+  data %>% 
+    group_by(across(data_mapped_aes_names)) ->
+  data
    # if(!("weight" %in% names(data))){data$weight <- 1}
   # order matters... Need to add text aesthetics
-  if("id" %in% names(data)){data <- group_by(data, id, .add = T)}
-  if("fill" %in% names(data)){data <- group_by(data, fill, .add = T)}
-  if("alpha" %in% names(data)){data <- group_by(data, alpha, .add = T)}
-  if("colour" %in% names(data)){data <- group_by(data, colour, .add = T)}
-  if("group" %in% names(data)){data <- group_by(data, group, .add = T)}
-  if("linetype" %in% names(data)){data <- group_by(data, linetype, .add = T)}
-  if("linewidth" %in% names(data)){data <- group_by(data, linewidth, .add = T)}
+  # if("id" %in% names(data)){data <- group_by(data, id, .add = T)}
+  # if("fill" %in% names(data)){data <- group_by(data, fill, .add = T)}
+  # if("alpha" %in% names(data)){data <- group_by(data, alpha, .add = T)}
+  # if("colour" %in% names(data)){data <- group_by(data, colour, .add = T)}
+  # if("group" %in% names(data)){data <- group_by(data, group, .add = T)}
+  # if("linetype" %in% names(data)){data <- group_by(data, linetype, .add = T)}
+  # if("linewidth" %in% names(data)){data <- group_by(data, linewidth, .add = T)}
   
   
   if(count){
@@ -178,6 +184,18 @@ filter(continent == "Americas") %>%
   select(area = pop, id = country) %>%
   compute_panel_circlepack_center() %>%
   head()
+#> Warning: There was 1 warning in `group_by()`.
+#> ℹ In argument: `across(data_mapped_aes_names)`.
+#> Caused by warning:
+#> ! Using an external vector in selections was deprecated in tidyselect 1.1.0.
+#> ℹ Please use `all_of()` or `any_of()` instead.
+#>   # Was:
+#>   data %>% select(data_mapped_aes_names)
+#> 
+#>   # Now:
+#>   data %>% select(all_of(data_mapped_aes_names))
+#> 
+#> See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.
 #>           x         y   radius      area        id     label
 #> 1 -3493.018     0.000 3493.018  38331121 Argentina Argentina
 #> 2  1639.564     0.000 1639.564   8445134   Bolivia   Bolivia
@@ -275,21 +293,27 @@ filter(year == 2002) %>%
 #' TBD
 compute_panel_circlepack <- function(data, scales, count = F){
 
+  data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 
+                                             "colour", "group", "linewidth", 
+                                             "linetype")]
+  
   if(is.null(data$area)){data$area <- 1}
   
-    if(is.null(data$area)){data$area <- 1}
+  data %>% 
+    group_by(across(data_mapped_aes_names)) ->
+  data 
   
    # if(!("weight" %in% names(data))){data$weight <- 1}
   # order matters... Need to add text aesthetics
-  if("id" %in% names(data)){data <- group_by(data, id, .add = T)}
-
-  if("fill" %in% names(data)){data <- group_by(data, fill, .add = T)}
-  if("alpha" %in% names(data)){data <- group_by(data, alpha, .add = T)}
-  if("colour" %in% names(data)){data <- group_by(data, colour, .add = T)}
-  if("group" %in% names(data)){data <- group_by(data, group, .add = T)}
-  if("linetype" %in% names(data)){data <- group_by(data, linetype, .add = T)}
-  if("linewidth" %in% names(data)){data <- group_by(data, linewidth, .add = T)}
-  
+  # if("id" %in% names(data)){data <- group_by(data, id, .add = T)}
+  # 
+  # if("fill" %in% names(data)){data <- group_by(data, fill, .add = T)}
+  # if("alpha" %in% names(data)){data <- group_by(data, alpha, .add = T)}
+  # if("colour" %in% names(data)){data <- group_by(data, colour, .add = T)}
+  # if("group" %in% names(data)){data <- group_by(data, group, .add = T)}
+  # if("linetype" %in% names(data)){data <- group_by(data, linetype, .add = T)}
+  # if("linewidth" %in% names(data)){data <- group_by(data, linewidth, .add = T)}
+  # 
   if(count){
   data %>% 
     mutate(id = as.integer(as.factor(id))) %>% 
@@ -298,6 +322,7 @@ compute_panel_circlepack <- function(data, scales, count = F){
     data
   } else { data$id = 1:nrow(data)}
   
+  data$id = 1:nrow(data)
   # data %>%
   #   mutate(id = row_number()) ->
   #   data1
@@ -315,7 +340,7 @@ compute_panel_circlepack <- function(data, scales, count = F){
     packcircles::circleProgressiveLayout(
       sizetype = 'area') %>%
     packcircles::circleLayoutVertices(npoints = 50) %>%
-    left_join(data) #%>%
+    left_join(data, by = join_by(id)) 
 
 }
 ```
@@ -330,7 +355,6 @@ filter(continent == "Americas") %>%
   rename(id = country, area = pop) %>%
   compute_panel_circlepack() %>%
   head()
-#> Joining with `by = join_by(id)`
 #>            x         y id continent year lifeExp     area gdpPercap
 #> 1    0.00000    0.0000  1  Americas 2002   74.34 38331121  8797.641
 #> 2  -27.54349  437.7912  1  Americas 2002   74.34 38331121  8797.641
@@ -394,7 +418,6 @@ filter(year == 2002) %>%
   geom_circlepack(alpha = .5) + 
   coord_equal() + 
   labs(title = "gapminder 2002 countries")
-#> Joining with `by = join_by(id)`
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
@@ -404,7 +427,6 @@ filter(year == 2002) %>%
 last_plot() +
   aes(fill = continent) + 
   labs(title = "from 5 continents")
-#> Joining with `by = join_by(id)`
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-2.png" width="100%" />
@@ -415,7 +437,6 @@ last_plot() +
   aes(area = pop) + 
   geom_circlepack_text() + 
   labs(title = "with very different populations")
-#> Joining with `by = join_by(id)`
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-3.png" width="100%" />
@@ -425,11 +446,6 @@ last_plot() +
 last_plot() +
   facet_wrap(facets = vars(continent)) + 
   labs(title = "faceting")
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-4.png" width="100%" />
@@ -440,11 +456,6 @@ last_plot() +
   scale_size_continuous(range = c(0, 4)) + 
   theme(legend.position = "none") + 
   labs(title = "remove legends")
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-5.png" width="100%" />
@@ -454,11 +465,6 @@ last_plot() +
 last_plot() + 
   aes(area = gdpPercap*pop) + 
   labs(title = "and very different GDPs")
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-6.png" width="100%" />
@@ -468,11 +474,6 @@ last_plot() +
 last_plot() + 
   aes(area = gdpPercap) + 
   labs(title = "and per capita GDPs")
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-7.png" width="100%" />
@@ -490,7 +491,6 @@ filter(year == 2002) %>%
   geom_circlepack_text(aes(label = after_stat(
     paste(id, "\n",
     round(area/1000000, 1), "mil."))), lineheight = .8)
-#> Joining with `by = join_by(id)`
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-8.png" width="100%" />
@@ -506,7 +506,6 @@ filter(year == 2002) %>%
   geom_circlepack_text(alpha = .5, count = T) + 
   coord_equal() +
   aes(fill = continent)
-#> Joining with `by = join_by(id)`
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-9.png" width="100%" />
@@ -515,7 +514,6 @@ filter(year == 2002) %>%
 
 last_plot() + 
   aes(id = country)
-#> Joining with `by = join_by(id)`
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-10.png" width="100%" />
@@ -524,7 +522,6 @@ last_plot() +
 
 last_plot() + 
   aes(area = pop)
-#> Joining with `by = join_by(id)`
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-11.png" width="100%" />
@@ -534,11 +531,6 @@ last_plot() +
 
 last_plot() + 
   facet_wrap(~continent)
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-12.png" width="100%" />
@@ -547,11 +539,6 @@ last_plot() +
 
 
 layer_data(i = 2)
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
-#> Joining with `by = join_by(id)`
 #>        fill     size                    group PANEL       area
 #> 1   #F8766D 1.779513                  Algeria     1   31287142
 #> 2   #F8766D 1.457016                   Angola     1   10866106
@@ -693,8 +680,8 @@ layer_data(i = 2)
 #> 138 #00B0F6 1.374742              Switzerland     4    7361757
 #> 139 #00B0F6 2.145017                   Turkey     4   67308928
 #> 140 #00B0F6 2.080105           United Kingdom     4   59912431
-#> 141  grey50 1.615124                Australia     5   19546792
-#> 142  grey50 1.270163              New Zealand     5    3908037
+#> 141 #E76BF3 1.615124                Australia     5   19546792
+#> 142 #E76BF3 1.270163              New Zealand     5    3908037
 #>                           id           x            y     radius
 #> 1                    Algeria  -3155.7894      0.00000  3155.7894
 #> 2                     Angola   1859.7820      0.00000  1859.7820
