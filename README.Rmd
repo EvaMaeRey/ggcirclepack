@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-circle pack is an experimental package that uses packcircles to handle circle packing computation. 
+circle pack is an experimental package that uses the {packcircles} package to handle circle packing computation. 
 
 ### Note to the reader
 
@@ -36,7 +36,7 @@ Your help and feedback would be greatly appreciated on any of the questions...
 - What tests should be performed?
 
 
-# status quo w/o {ggcirclepack}: loads of work before plotting
+# status quo w/o {ggcirclepack}: precomputation required to two more data frames
 
 ```{r}
 library(tidyverse)
@@ -102,24 +102,38 @@ filter(year == 2002) %>%
 #'
 #' @examples
 #' # TBD
-compute_panel_circlepack_center <- function(data, scales){
+compute_panel_circlepack_center <- function(data, scales, count = F){
 
-  data ->
-    data1
-
-  if(is.null(data$area)){
-
-    data1 %>%
-      mutate(area = 1) ->
-      data1
-
+  # data ->
+  #   data1
+  
+  
+  
+  if(is.null(data$area)){data$area <- 1}
+  
+   # if(!("weight" %in% names(data))){data$weight <- 1}
+  # order matters... Need to add text aesthetics
+  if("id" %in% names(data)){data <- group_by(data, id, .add = T)}
+  if("fill" %in% names(data)){data <- group_by(data, fill, .add = T)}
+  if("alpha" %in% names(data)){data <- group_by(data, alpha, .add = T)}
+  if("colour" %in% names(data)){data <- group_by(data, colour, .add = T)}
+  if("group" %in% names(data)){data <- group_by(data, group, .add = T)}
+  if("linetype" %in% names(data)){data <- group_by(data, linetype, .add = T)}
+  if("linewidth" %in% names(data)){data <- group_by(data, linewidth, .add = T)}
+  
+  
+  if(count){
+  data %>% 
+    count(wt = area) %>% 
+    rename(area = n) ->
+    data
   }
 
-  data1 %>%
+  data %>%
     pull(area) %>%
     packcircles::circleProgressiveLayout(
       sizetype = 'area') %>%
-    cbind(data1) %>%
+    cbind(data) %>%
     mutate(label = id)
 
 }
@@ -135,6 +149,11 @@ filter(continent == "Americas") %>%
   select(area = pop, id = country) %>%
   compute_panel_circlepack_center() %>%
   head()
+
+gapminder::gapminder %>% 
+  filter(year == 2002) %>% 
+  select(id = continent) %>% 
+  compute_panel_circlepack_center(count = T)
 
 ```
 
@@ -215,26 +234,49 @@ filter(year == 2002) %>%
 #'
 #' @examples
 #' TBD
-compute_panel_circlepack <- function(data, scales){
+compute_panel_circlepack <- function(data, scales, count = F){
+
+  if(is.null(data$area)){data$area <- 1}
+  
+    if(is.null(data$area)){data$area <- 1}
+  
+   # if(!("weight" %in% names(data))){data$weight <- 1}
+  # order matters... Need to add text aesthetics
+  if("id" %in% names(data)){data <- group_by(data, id, .add = T)}
+
+  if("fill" %in% names(data)){data <- group_by(data, fill, .add = T)}
+  if("alpha" %in% names(data)){data <- group_by(data, alpha, .add = T)}
+  if("colour" %in% names(data)){data <- group_by(data, colour, .add = T)}
+  if("group" %in% names(data)){data <- group_by(data, group, .add = T)}
+  if("linetype" %in% names(data)){data <- group_by(data, linetype, .add = T)}
+  if("linewidth" %in% names(data)){data <- group_by(data, linewidth, .add = T)}
+  
+  if(count){
+  data %>% 
+    mutate(id = as.integer(as.factor(id))) %>% 
+    count(wt = area) %>% 
+    rename(area = n) ->
+    data
+  } else { data$id = 1:nrow(data)}
+  
+  # data %>%
+  #   mutate(id = row_number()) ->
+  #   data1
+
+  # if(is.null(data$area)){
+  # 
+  #   data1 %>%
+  #     mutate(area = 1) ->
+  #     data1
+  # 
+  # }
 
   data %>%
-    mutate(id = row_number()) ->
-    data1
-
-  if(is.null(data$area)){
-
-    data1 %>%
-      mutate(area = 1) ->
-      data1
-
-  }
-
-  data1 %>%
     pull(area) %>%
     packcircles::circleProgressiveLayout(
       sizetype = 'area') %>%
     packcircles::circleLayoutVertices(npoints = 50) %>%
-    left_join(data1) #%>%
+    left_join(data) #%>%
 
 }
 ```
@@ -246,7 +288,7 @@ gapminder::gapminder %>%
 filter(continent == "Americas") %>%
   filter(year == 2002) %>%
   # input must have required aesthetic inputs as columns
-  rename(area = pop) %>%
+  rename(id = country, area = pop) %>%
   compute_panel_circlepack() %>%
   head()
 
@@ -344,16 +386,45 @@ filter(year == 2002) %>%
   geom_circlepack_text(aes(label = after_stat(
     paste(id, "\n",
     round(area/1000000, 1), "mil."))), lineheight = .8)
+
+
+gapminder::gapminder %>%
+filter(year == 2002) %>%
+  ggplot() +
+  aes(id = continent) + 
+  geom_circlepack(count = T) +
+  geom_circlepack_text(alpha = .5, count = T) + 
+  coord_equal() +
+  aes(fill = continent)
+
+last_plot() + 
+  aes(id = country)
+
+last_plot() + 
+  aes(area = pop)
+ 
+
+last_plot() + 
+  facet_wrap(~continent)
+
+
+layer_data(i = 2)
 ```
 
 
 # Package the functions
 
 ```{r}
-readme2pkg::chunk_to_r(chunk_name = "compute_panel_circlepack")
-readme2pkg::chunk_to_r(chunk_name = "geom_circlepack")
-readme2pkg::chunk_to_r(chunk_name = "compute_panel_circlepack_center")
-readme2pkg::chunk_to_r(chunk_name = "geom_circlepack_text")
+knitrExtra:::chunk_to_r(chunk_name = "compute_panel_circlepack")
+knitrExtra:::chunk_to_r(chunk_name = "geom_circlepack")
+knitrExtra:::chunk_to_r(chunk_name = "compute_panel_circlepack_center")
+knitrExtra:::chunk_to_r(chunk_name = "geom_circlepack_text")
+```
+
+
+```{r, eval = F}
+devtools::check()
+devtools::install(pkg = ".", upgrade = "never") 
 ```
 
 
@@ -363,7 +434,7 @@ Wish list for ggcirclepack:
 
 ## More computation under the hood for a count data case.  
 
-```{r}
+```{r, eval = F}
 tidytitanic::tidy_titanic %>% 
   head()
 ```
@@ -382,4 +453,10 @@ tidytitanic::tidy_titanic() +
 
 ## Quiet the joins.
 ## create a ggcirclepack()/defaults_circlepack() function for preferred defaults.
+
+
+```{r}
+
+
+```
 
