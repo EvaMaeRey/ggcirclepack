@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' TBD
-compute_panel_circlepack <- function(data, scales){
+compute_panel_circlepack <- function(data, scales, npoints = 3){
 
   data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 
                                              "colour", "group", "linewidth", 
@@ -24,6 +24,9 @@ compute_panel_circlepack <- function(data, scales){
   data %>% 
     count(wt = area) %>% 
     ungroup() %>% 
+    ungroup() %>% 
+    ungroup() %>% 
+    ungroup() %>% 
     # arrange(id) %>%  # this doesn't feel very principled
     rename(area = n) ->
   data
@@ -34,7 +37,7 @@ compute_panel_circlepack <- function(data, scales){
     pull(area) %>%
     packcircles::circleProgressiveLayout(
       sizetype = 'area') %>%
-    packcircles::circleLayoutVertices(npoints = 50) %>%
+    packcircles::circleLayoutVertices(npoints = npoints) %>%
     left_join(data, by = join_by(id)) 
 
 }

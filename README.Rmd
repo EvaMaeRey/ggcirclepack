@@ -105,7 +105,8 @@ filter(year == 2002) %>%
 compute_panel_circlepack_center <- function(data, scales){
 
   # get aes names as they appear in the data
-  data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 
+  data_mapped_aes_names <- names(data)[names(data) %in% 
+                                         c("id", "fill", "alpha", 
                                              "colour", "group", "linewidth", 
                                              "linetype")]
   
@@ -117,7 +118,7 @@ compute_panel_circlepack_center <- function(data, scales){
   
   data %>% 
     count(wt = area) %>% 
-    ungroup() %>% 
+    # ungroup() %>% 
     # arrange(id) %>% # this doesn't feel very principled
     rename(area = n) ->
   data
@@ -227,7 +228,7 @@ filter(year == 2002) %>%
 #'
 #' @examples
 #' TBD
-compute_panel_circlepack <- function(data, scales){
+compute_panel_circlepack <- function(data, scales, npoints = 3){
 
   data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 
                                              "colour", "group", "linewidth", 
@@ -242,6 +243,9 @@ compute_panel_circlepack <- function(data, scales){
   data %>% 
     count(wt = area) %>% 
     ungroup() %>% 
+    ungroup() %>% 
+    ungroup() %>% 
+    ungroup() %>% 
     # arrange(id) %>%  # this doesn't feel very principled
     rename(area = n) ->
   data
@@ -252,7 +256,7 @@ compute_panel_circlepack <- function(data, scales){
     pull(area) %>%
     packcircles::circleProgressiveLayout(
       sizetype = 'area') %>%
-    packcircles::circleLayoutVertices(npoints = 50) %>%
+    packcircles::circleLayoutVertices(npoints = npoints) %>%
     left_join(data, by = join_by(id)) 
 
 }
@@ -420,7 +424,7 @@ tidytitanic::tidy_titanic %>%
 tidytitanic::tidy_titanic %>% 
   ggplot() + 
   aes(id = "all") + 
-  geom_circlepack(alpha = .5) +
+  geom_circlepack() +
   geom_circlepack_text(aes(label = after_stat(area))) +
   coord_equal()
 
@@ -428,11 +432,16 @@ last_plot() +
   aes(fill = sex) 
 
 layer_data(i = 2)
+layer_data(i = 1)
+
+
 
 last_plot() + 
   aes(alpha = age) 
 
 layer_data(i = 2)
+layer_data(i = 1)
+
 
 
 last_plot() + 
@@ -442,6 +451,8 @@ last_plot() +
   facet_wrap(~class)
 
 layer_data(i = 2)
+layer_data(i = 1)
+
 
 tidytitanic::tidy_titanic %>% 
   count(sex, survived, class)

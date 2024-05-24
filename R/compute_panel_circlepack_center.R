@@ -8,7 +8,8 @@
 compute_panel_circlepack_center <- function(data, scales){
 
   # get aes names as they appear in the data
-  data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 
+  data_mapped_aes_names <- names(data)[names(data) %in% 
+                                         c("id", "fill", "alpha", 
                                              "colour", "group", "linewidth", 
                                              "linetype")]
   
@@ -20,7 +21,7 @@ compute_panel_circlepack_center <- function(data, scales){
   
   data %>% 
     count(wt = area) %>% 
-    ungroup() %>% 
+    # ungroup() %>% 
     # arrange(id) %>% # this doesn't feel very principled
     rename(area = n) ->
   data
