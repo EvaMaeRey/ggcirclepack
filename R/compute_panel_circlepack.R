@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' TBD
-compute_panel_circlepack <- function(data, scales, npoints = 3){
+compute_panel_circlepack <- function(data, scales, npoints = 50){
 
   data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 
                                              "colour", "group", "linewidth", 
@@ -23,11 +23,8 @@ compute_panel_circlepack <- function(data, scales, npoints = 3){
   
   data %>% 
     count(wt = area) %>% 
-    ungroup() %>% 
-    ungroup() %>% 
-    ungroup() %>% 
-    ungroup() %>% 
-    # arrange(id) %>%  # this doesn't feel very principled
+    # ungroup() %>%
+    arrange(id) %>%  # this doesn't feel very principled
     rename(area = n) ->
   data
 

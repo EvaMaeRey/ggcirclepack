@@ -21,10 +21,6 @@
   - [Issues](#issues)
       - [More computation under the hood for a count data
         case.](#more-computation-under-the-hood-for-a-count-data-case)
-      - [Quiet the joins.](#quiet-the-joins)
-      - [create a ggcirclepack()/defaults\_circlepack() function for
-        preferred
-        defaults.](#create-a-ggcirclepackdefaults_circlepack-function-for-preferred-defaults)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -147,8 +143,8 @@ compute_panel_circlepack_center <- function(data, scales){
   
   data %>% 
     count(wt = area) %>% 
-    # ungroup() %>% 
-    # arrange(id) %>% # this doesn't feel very principled
+    # ungroup() %>%
+    arrange(id) %>% # this doesn't feel very principled; motivation is when you go from no fill to color, preserves circle position...
     rename(area = n) ->
   data
 
@@ -279,7 +275,7 @@ filter(year == 2002) %>%
 #'
 #' @examples
 #' TBD
-compute_panel_circlepack <- function(data, scales, npoints = 3){
+compute_panel_circlepack <- function(data, scales, npoints = 50){
 
   data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 
                                              "colour", "group", "linewidth", 
@@ -293,11 +289,8 @@ compute_panel_circlepack <- function(data, scales, npoints = 3){
   
   data %>% 
     count(wt = area) %>% 
-    ungroup() %>% 
-    ungroup() %>% 
-    ungroup() %>% 
-    ungroup() %>% 
-    # arrange(id) %>%  # this doesn't feel very principled
+    # ungroup() %>%
+    arrange(id) %>%  # this doesn't feel very principled
     rename(area = n) ->
   data
 
@@ -323,13 +316,13 @@ filter(continent == "Americas") %>%
   rename(id = country, area = pop) %>%
   compute_panel_circlepack() %>%
   head()
-#>            x             y id     area
-#> 1     0.0000  0.000000e+00  1 38331121
-#> 2 -5239.5270  3.025042e+03  1 38331121
-#> 3 -5239.5270 -3.025042e+03  1 38331121
-#> 4     0.0000 -8.555427e-13  1 38331121
-#> 5  3279.1277  0.000000e+00  2  8445134
-#> 6   819.7819  1.419904e+03  2  8445134
+#>            x         y id     area
+#> 1    0.00000    0.0000  1 38331121
+#> 2  -27.54349  437.7912  1 38331121
+#> 3 -109.73958  868.6783  1 38331121
+#> 4 -245.29200 1285.8657  1 38331121
+#> 5 -432.06299 1682.7743  1 38331121
+#> 6 -667.10708 2053.1445  1 38331121
 ```
 
 ### Step 2 & 3 ggproto and geom
@@ -466,7 +459,6 @@ filter(year == 2002) %>%
 
 ``` r
 
-
 gapminder::gapminder %>%
 filter(year == 2002) %>%
   ggplot() +
@@ -504,441 +496,6 @@ last_plot() +
 
 <img src="man/figures/README-unnamed-chunk-6-12.png" width="100%" />
 
-``` r
-
-
-layer_data(i = 2)
-#>        fill     size                    group                    label PANEL
-#> 1   #F8766D 1.779513                  Algeria                  Algeria     1
-#> 2   #F8766D 1.457016                   Angola                   Angola     1
-#> 3   #F8766D 1.365892                    Benin                    Benin     1
-#> 4   #F8766D 1.168849                 Botswana                 Botswana     1
-#> 5   #F8766D 1.485707             Burkina Faso             Burkina Faso     1
-#> 6   #F8766D 1.365758                  Burundi                  Burundi     1
-#> 7   #F8766D 1.554752                 Cameroon                 Cameroon     1
-#> 8   #F8766D 1.275176 Central African Republic Central African Republic     1
-#> 9   #F8766D 1.411358                     Chad                     Chad     1
-#> 10  #F8766D 1.093116                  Comoros                  Comoros     1
-#> 11  #F8766D 2.038324         Congo, Dem. Rep.         Congo, Dem. Rep.     1
-#> 12  #F8766D 1.248348              Congo, Rep.              Congo, Rep.     1
-#> 13  #F8766D 1.560404            Cote d'Ivoire            Cote d'Ivoire     1
-#> 14  #F8766D 1.073553                 Djibouti                 Djibouti     1
-#> 15  #F8766D 2.195116                    Egypt                    Egypt     1
-#> 16  #F8766D 1.079696        Equatorial Guinea        Equatorial Guinea     1
-#> 17  #F8766D 1.287898                  Eritrea                  Eritrea     1
-#> 18  #F8766D 2.150444                 Ethiopia                 Ethiopia     1
-#> 19  #F8766D 1.148477                    Gabon                    Gabon     1
-#> 20  #F8766D 1.158556                   Gambia                   Gambia     1
-#> 21  #F8766D 1.630859                    Ghana                    Ghana     1
-#> 22  #F8766D 1.410694                   Guinea                   Guinea     1
-#> 23  #F8766D 1.150642            Guinea-Bissau            Guinea-Bissau     1
-#> 24  #F8766D 1.780761                    Kenya                    Kenya     1
-#> 25  #F8766D 1.191421                  Lesotho                  Lesotho     1
-#> 26  #F8766D 1.227237                  Liberia                  Liberia     1
-#> 27  #F8766D 1.318605                    Libya                    Libya     1
-#> 28  #F8766D 1.564237               Madagascar               Madagascar     1
-#> 29  #F8766D 1.477052                   Malawi                   Malawi     1
-#> 30  #F8766D 1.450866                     Mali                     Mali     1
-#> 31  #F8766D 1.227847               Mauritania               Mauritania     1
-#> 32  #F8766D 1.141811                Mauritius                Mauritius     1
-#> 33  #F8766D 1.778016                  Morocco                  Morocco     1
-#> 34  #F8766D 1.597850               Mozambique               Mozambique     1
-#> 35  #F8766D 1.187576                  Namibia                  Namibia     1
-#> 36  #F8766D 1.462844                    Niger                    Niger     1
-#> 37  #F8766D 2.529076                  Nigeria                  Nigeria     1
-#> 38  #F8766D 1.105836                  Reunion                  Reunion     1
-#> 39  #F8766D 1.387315                   Rwanda                   Rwanda     1
-#> 40  #F8766D 1.000000    Sao Tome and Principe    Sao Tome and Principe     1
-#> 41  #F8766D 1.457100                  Senegal                  Senegal     1
-#> 42  #F8766D 1.318314             Sierra Leone             Sierra Leone     1
-#> 43  #F8766D 1.384809                  Somalia                  Somalia     1
-#> 44  #F8766D 1.929710             South Africa             South Africa     1
-#> 45  #F8766D 1.849095                    Sudan                    Sudan     1
-#> 46  #F8766D 1.136911                Swaziland                Swaziland     1
-#> 47  #F8766D 1.819885                 Tanzania                 Tanzania     1
-#> 48  #F8766D 1.306382                     Togo                     Togo     1
-#> 49  #F8766D 1.432978                  Tunisia                  Tunisia     1
-#> 50  #F8766D 1.692667                   Uganda                   Uganda     1
-#> 51  #F8766D 1.451204                   Zambia                   Zambia     1
-#> 52  #F8766D 1.479137                 Zimbabwe                 Zimbabwe     1
-#> 53  #A3A500 1.863246                Argentina                Argentina     2
-#> 54  #A3A500 1.401979                  Bolivia                  Bolivia     2
-#> 55  #A3A500 2.873497                   Brazil                   Brazil     2
-#> 56  #A3A500 1.787180                   Canada                   Canada     2
-#> 57  #A3A500 1.547079                    Chile                    Chile     2
-#> 58  #A3A500 1.893012                 Colombia                 Colombia     2
-#> 59  #A3A500 1.267508               Costa Rica               Costa Rica     2
-#> 60  #A3A500 1.464662                     Cuba                     Cuba     2
-#> 61  #A3A500 1.406933       Dominican Republic       Dominican Republic     2
-#> 62  #A3A500 1.498995                  Ecuador                  Ecuador     2
-#> 63  #A3A500 1.347485              El Salvador              El Salvador     2
-#> 64  #A3A500 1.463645                Guatemala                Guatemala     2
-#> 65  #A3A500 1.381095                    Haiti                    Haiti     2
-#> 66  #A3A500 1.356463                 Honduras                 Honduras     2
-#> 67  #A3A500 1.220698                  Jamaica                  Jamaica     2
-#> 68  #A3A500 2.413462                   Mexico                   Mexico     2
-#> 69  #A3A500 1.311736                Nicaragua                Nicaragua     2
-#> 70  #A3A500 1.234687                   Panama                   Panama     2
-#> 71  #A3A500 1.334042                 Paraguay                 Paraguay     2
-#> 72  #A3A500 1.720708                     Peru                     Peru     2
-#> 73  #A3A500 1.268407              Puerto Rico              Puerto Rico     2
-#> 74  #A3A500 1.134868      Trinidad and Tobago      Trinidad and Tobago     2
-#> 75  #A3A500 3.369457            United States            United States     2
-#> 76  #A3A500 1.249693                  Uruguay                  Uruguay     2
-#> 77  #A3A500 1.686263                Venezuela                Venezuela     2
-#> 78  #00BF7D 1.700077              Afghanistan              Afghanistan     3
-#> 79  #00BF7D 1.097422                  Bahrain                  Bahrain     3
-#> 80  #00BF7D 2.626574               Bangladesh               Bangladesh     3
-#> 81  #00BF7D 1.499102                 Cambodia                 Cambodia     3
-#> 82  #00BF7D 6.000000                    China                    China     3
-#> 83  #00BF7D 1.358788         Hong Kong, China         Hong Kong, China     3
-#> 84  #00BF7D 5.493521                    India                    India     3
-#> 85  #00BF7D 3.029335                Indonesia                Indonesia     3
-#> 86  #00BF7D 2.141592                     Iran                     Iran     3
-#> 87  #00BF7D 1.682184                     Iraq                     Iraq     3
-#> 88  #00BF7D 1.338255                   Israel                   Israel     3
-#> 89  #00BF7D 2.574161                    Japan                    Japan     3
-#> 90  #00BF7D 1.316727                   Jordan                   Jordan     3
-#> 91  #00BF7D 1.656117         Korea, Dem. Rep.         Korea, Dem. Rep.     3
-#> 92  #00BF7D 1.966128              Korea, Rep.              Korea, Rep.     3
-#> 93  #00BF7D 1.194697                   Kuwait                   Kuwait     3
-#> 94  #00BF7D 1.261709                  Lebanon                  Lebanon     3
-#> 95  #00BF7D 1.662735                 Malaysia                 Malaysia     3
-#> 96  #00BF7D 1.221122                 Mongolia                 Mongolia     3
-#> 97  #00BF7D 1.941860                  Myanmar                  Myanmar     3
-#> 98  #00BF7D 1.708472                    Nepal                    Nepal     3
-#> 99  #00BF7D 1.222847                     Oman                     Oman     3
-#> 100 #00BF7D 2.729826                 Pakistan                 Pakistan     3
-#> 101 #00BF7D 2.271763              Philippines              Philippines     3
-#> 102 #00BF7D 1.689299             Saudi Arabia             Saudi Arabia     3
-#> 103 #00BF7D 1.280439                Singapore                Singapore     3
-#> 104 #00BF7D 1.615600                Sri Lanka                Sri Lanka     3
-#> 105 #00BF7D 1.575923                    Syria                    Syria     3
-#> 106 #00BF7D 1.659662                   Taiwan                   Taiwan     3
-#> 107 #00BF7D 2.105960                 Thailand                 Thailand     3
-#> 108 #00BF7D 2.255638                  Vietnam                  Vietnam     3
-#> 109 #00BF7D 1.250727       West Bank and Gaza       West Bank and Gaza     3
-#> 110 #00BF7D 1.601553              Yemen, Rep.              Yemen, Rep.     3
-#> 111 #00B0F6 1.255316                  Albania                  Albania     4
-#> 112 #00B0F6 1.394704                  Austria                  Austria     4
-#> 113 #00B0F6 1.445020                  Belgium                  Belgium     4
-#> 114 #00B0F6 1.279310   Bosnia and Herzegovina   Bosnia and Herzegovina     4
-#> 115 #00B0F6 1.382480                 Bulgaria                 Bulgaria     4
-#> 116 #00B0F6 1.290133                  Croatia                  Croatia     4
-#> 117 #00B0F6 1.443797           Czech Republic           Czech Republic     4
-#> 118 #00B0F6 1.318793                  Denmark                  Denmark     4
-#> 119 #00B0F6 1.313179                  Finland                  Finland     4
-#> 120 #00B0F6 2.080219                   France                   France     4
-#> 121 #00B0F6 2.266805                  Germany                  Germany     4
-#> 122 #00B0F6 1.451379                   Greece                   Greece     4
-#> 123 #00B0F6 1.439974                  Hungary                  Hungary     4
-#> 124 #00B0F6 1.047933                  Iceland                  Iceland     4
-#> 125 #00B0F6 1.269117                  Ireland                  Ireland     4
-#> 126 #00B0F6 2.062006                    Italy                    Italy     4
-#> 127 #00B0F6 1.103622               Montenegro               Montenegro     4
-#> 128 #00B0F6 1.558136              Netherlands              Netherlands     4
-#> 129 #00B0F6 1.291964                   Norway                   Norway     4
-#> 130 #00B0F6 1.866574                   Poland                   Poland     4
-#> 131 #00B0F6 1.447686                 Portugal                 Portugal     4
-#> 132 #00B0F6 1.658923                  Romania                  Romania     4
-#> 133 #00B0F6 1.440601                   Serbia                   Serbia     4
-#> 134 #00B0F6 1.319874          Slovak Republic          Slovak Republic     4
-#> 135 #00B0F6 1.189613                 Slovenia                 Slovenia     4
-#> 136 #00B0F6 1.883607                    Spain                    Spain     4
-#> 137 #00B0F6 1.414159                   Sweden                   Sweden     4
-#> 138 #00B0F6 1.374742              Switzerland              Switzerland     4
-#> 139 #00B0F6 2.145017                   Turkey                   Turkey     4
-#> 140 #00B0F6 2.080105           United Kingdom           United Kingdom     4
-#> 141 #E76BF3 1.615124                Australia                Australia     5
-#> 142 #E76BF3 1.270163              New Zealand              New Zealand     5
-#>           area                       id           x            y     radius
-#> 1     31287142                  Algeria  -3155.7894      0.00000  3155.7894
-#> 2     10866106                   Angola   1859.7820      0.00000  1859.7820
-#> 3      7026113                    Benin    386.4290  -3014.47517  1495.4870
-#> 4      1630347                 Botswana    186.1453   1963.72240   720.3857
-#> 5     12251209             Burkina Faso   2135.7483   3824.59962  1974.7610
-#> 6      7021078                  Burundi   4804.4627   1607.19912  1494.9510
-#> 7     15929988                 Cameroon   5399.3595  -2092.03815  2251.8154
-#> 8      4048013 Central African Republic   2740.0320  -4189.50887  1135.1311
-#> 9      8835739                     Chad  -1448.9689   4521.40671  1677.0519
-#> 10      614382                  Comoros   1262.8459  -4742.66062   442.2260
-#> 11    55379852         Congo, Dem. Rep.  -1704.7341  -8310.63161  4198.5658
-#> 12     3328795              Congo, Rep.  -4571.1377  -3938.56451  1029.3631
-#> 13    16252726            Cote d'Ivoire  -7720.7857  -2940.91449  2274.5117
-#> 14      447416                 Djibouti  -6651.3395   -514.22473   377.3817
-#> 15    73312559                    Egypt -10230.1696   3706.46749  4830.7466
-#> 16      495627        Equatorial Guinea  -5049.3183   3006.36626   397.1939
-#> 17     4414865                  Eritrea  -4303.2047   4738.80781  1185.4515
-#> 18    67946797                 Ethiopia   1006.8178  10353.07609  4650.6061
-#> 19     1299304                    Gabon   3792.4439   5851.56058   643.1029
-#> 20     1457766                   Gambia   4604.0747   4805.13330   681.1911
-#> 21    20550751                    Ghana   7807.6143   4328.32945  2557.6370
-#> 22     8807818                   Guinea  -4675.1279   7574.37194  1674.4001
-#> 23     1332459            Guinea-Bissau   2539.9286  -5964.65360   651.2564
-#> 24    31386842                    Kenya   6043.8336  -7466.16182  3160.8135
-#> 25     2046772                  Lesotho   7038.7595   1052.55116   807.1603
-#> 26     2814651                  Liberia   8084.8787   -354.95971   946.5364
-#> 27     5368585                    Libya   8941.3990  -2439.63630  1307.2390
-#> 28    16473477               Madagascar  11064.2851  -5343.56609  2289.9062
-#> 29    11824495                   Malawi  -7733.6974  -7155.47176  1940.0654
-#> 30    10580176                     Mali  -7425.9373   9753.81855  1835.1498
-#> 31     2828858               Mauritania   3050.3125 -10281.96721   948.9223
-#> 32     1200206                Mauritius   5041.1368   6028.69887   618.0918
-#> 33    31167783                  Morocco   8796.7339   9949.36755  3149.7640
-#> 34    18473780               Mozambique  11271.3350    746.59508  2424.9509
-#> 35     1972153                  Namibia  11963.2939  -2395.37296   792.3104
-#> 36    11140655                    Niger -11106.1346  -5354.50140  1883.1305
-#> 37   119901274                  Nigeria -18855.3232  -3134.27798  6177.8444
-#> 38      743981                  Reunion   1965.7387 -11222.46320   486.6380
-#> 39     7852401                   Rwanda   1372.1768 -13203.05077  1580.9797
-#> 40      170372    Sao Tome and Principe   -306.3852 -12515.66356   232.8757
-#> 41    10870037                  Senegal  -1866.0305 -14367.16828  1860.1183
-#> 42     5359092             Sierra Leone  -4690.0441 -12935.46442  1306.0827
-#> 43     7753310                  Somalia  -6812.6528 -10993.30580  1570.9727
-#> 44    44433622             South Africa -12143.6539 -10902.25521  3760.8059
-#> 45    37090298                    Sudan  -5773.8717  14759.40261  3436.0164
-#> 46     1130269                Swaziland  10145.3435   6450.71336   599.8131
-#> 47    34593779                 Tanzania  14008.3948   5795.77063  3318.3643
-#> 48     4977378                     Togo  10257.5072  -8799.25419  1258.7091
-#> 49     9770575                  Tunisia   8882.0018 -11490.34508  1763.5392
-#> 50    24739869                   Uganda   5531.6798 -14598.10348  2806.2332
-#> 51    10595811                   Zambia   -824.3196  16576.38303  1836.5052
-#> 52    11926563                 Zimbabwe   2959.7582  16656.50196  1948.4206
-#> 53    38331121                Argentina  -3493.0180      0.00000  3493.0180
-#> 54     8445134                  Bolivia   1639.5639      0.00000  1639.5639
-#> 55   179914212                   Brazil   2732.7743  -9142.02597  7567.5936
-#> 56    31902268                   Canada   1150.7522   4801.40687  3186.6608
-#> 57    15497046                    Chile   5273.8171   1302.38056  2221.0049
-#> 58    41008227                 Colombia  10562.3302  -1160.65083  3612.9384
-#> 59     3834934               Costa Rica  -4573.1172  -4469.20485  1104.8518
-#> 60    11226999                     Cuba  -7453.2262  -3646.65467  1890.4139
-#> 61     8650322       Dominican Republic  -8636.6596   -299.95539  1659.3622
-#> 62    12921234                  Ecuador  -7908.2513   3314.78876  2028.0425
-#> 63     6353681              El Salvador  -4769.2005   4746.57653  1422.1250
-#> 64    11178650                Guatemala  -3084.4567   7593.95642  1886.3390
-#> 65     7607651                    Haiti   -133.6785   9366.97966  1556.1460
-#> 66     6677328                 Honduras   2869.9023   9116.08267  1457.8956
-#> 67     2664659                  Jamaica   4409.2334   7302.39437   920.9708
-#> 68   102479927                   Mexico  10986.7220   8154.04950  5711.4249
-#> 69     5146848                Nicaragua  -5728.2786  -6555.57011  1279.9580
-#> 70     2990875                   Panama  -7982.0775  -6463.57264   975.7177
-#> 71     5884491                 Paraguay  -6893.5704   6556.34194  1368.6094
-#> 72    26769436                     Peru  -6631.4420  10836.00230  2919.0711
-#> 73     3859606              Puerto Rico  -2614.0309  10551.51652  1108.4001
-#> 74     1101832      Trinidad and Tobago  -1083.9386  11293.75953   592.2196
-#> 75   287675526            United States -18526.1513  -6598.52359  9569.2196
-#> 76     3363085                  Uruguay -11041.9619    913.39931  1034.6512
-#> 77    24287670                Venezuela   4129.4010  13162.98191  2780.4686
-#> 78    25268405              Afghanistan  -2836.0506      0.00000  2836.0506
-#> 79      656397                  Bahrain    457.0970      0.00000   457.0970
-#> 80   135656790               Bangladesh   4747.0151  -5567.20800  6571.2173
-#> 81    12926707                 Cambodia   1416.8177   2361.50197  2028.4720
-#> 82  1280400000                    China  -8192.5244  22392.51981 20188.2138
-#> 83     6762476         Hong Kong, China   4119.9273   4577.95227  1467.1615
-#> 84  1034172547                    India  26518.4355   6129.95110 18143.5208
-#> 85   211060000                Indonesia  -9697.6448  -8639.18552  8196.4922
-#> 86    66907826                     Iran -19065.8199     99.77327  4614.9131
-#> 87    24001816                     Iraq  13040.1976  -9853.28833  2764.0578
-#> 88     6029529                   Israel   9471.0383 -11969.62444  1385.3731
-#> 89   127065841                    Japan   5286.3371 -18486.91510  6359.7416
-#> 90     5307470                   Jordan    725.5011 -12333.29823  1299.7770
-#> 91    22215365         Korea, Dem. Rep.  -3696.9418 -17685.60588  2659.2048
-#> 92    47969150              Korea, Rep.  -9509.1947 -20741.77442  3907.5638
-#> 93     2111561                   Kuwait -12609.0113 -17172.53868   819.8358
-#> 94     3677780                  Lebanon -14428.9965 -16620.68276  1081.9768
-#> 95    22662365                 Malaysia -18057.5904 -15605.97343  2685.8248
-#> 96     2674234                 Mongolia -18175.0846 -11999.43796   922.6240
-#> 97    45598081                  Myanmar -21702.1523  -8844.23398  3809.7664
-#> 98    25873917                    Nepal -25651.3815  -3457.15728  2869.8299
-#> 99     2713462                     Oman  11442.1935 -13183.11780   929.3663
-#> 100  153403524                 Pakistan  18618.8035 -17851.95059  6987.8365
-#> 101   82995088              Philippines  30698.5980 -16775.11481  5139.8596
-#> 102   24501530             Saudi Arabia  -2654.9295 -23036.98822  2792.6832
-#> 103    4197776                Singapore  -6267.3251 -24631.41915  1155.9384
-#> 104   19576783                Sri Lanka -25945.1467   1900.91955  2496.2940
-#> 105   17155814                    Syria -23962.2989   6308.59350  2336.8494
-#> 106   22454239                   Taiwan  11824.2073 -24720.29658  2673.4633
-#> 107   62806748                 Thailand   6314.5545 -29268.98281  4471.2424
-#> 108   80908147                  Vietnam  -3092.4749 -30892.32148  5074.8264
-#> 109    3389578       West Bank and Gaza -14014.6262 -18700.50146  1038.7185
-#> 110   18701257              Yemen, Rep. -23138.0338 -14926.64816  2439.8350
-#> 111    3508512                  Albania  -1056.7848      0.00000  1056.7848
-#> 112    8148312                  Austria   1610.4932      0.00000  1610.4932
-#> 113   10311970                  Belgium   -376.1047  -2786.59456  1811.7400
-#> 114    4165416   Bosnia and Herzegovina  -2894.2885  -1224.74006  1151.4743
-#> 115    7661799                 Bulgaria  -3224.9057   1468.18906  1561.6742
-#> 116    4481020                  Croatia   -567.0923   2197.17655  1194.3002
-#> 117   10256295           Czech Republic   2196.8109   3366.66231  1806.8426
-#> 118    5374693                  Denmark   4319.0912   1086.73661  1307.9824
-#> 119    5193039                  Finland   4089.9069  -1496.78902  1285.6888
-#> 120   59925035                   France   3999.9669  -7149.22508  4367.4628
-#> 121   82350671                  Germany  -2824.7572   8137.73681  5119.8665
-#> 122   10603863                   Greece  -2098.0358  -6003.69535  1837.2029
-#> 123   10083313                  Hungary  -4740.4739  -3516.66874  1791.5407
-#> 124     288030                  Iceland  -4328.8741  -1463.18054   302.7917
-#> 125    3879155                  Ireland  -5191.0702   -342.46631  1111.2036
-#> 126   57926999                    Italy -10025.9125   2074.32993  4294.0350
-#> 127     720230               Montenegro   2191.9933   5652.30700   478.8072
-#> 128   16122830              Netherlands   4803.5246   6495.27825  2265.4042
-#> 129    4535591                   Norway   5737.9920   3156.63404  1201.5504
-#> 130   38625976                   Poland   8807.4734   -654.80352  3506.4270
-#> 131   10433867                 Portugal  10049.1477  -5836.96724  1822.4168
-#> 132   22404337                  Romania   9631.1134   5466.95540  2670.4910
-#> 133   10111559                   Serbia  -8317.1704  -3769.03881  1794.0483
-#> 134    5410052          Slovak Republic  -5192.9677  -6587.32647  1312.2778
-#> 135    2011497                 Slovenia  -7256.7857  -6136.64869   800.1746
-#> 136   40152517                    Spain   4789.6039  12335.71035  3575.0445
-#> 137    8954175                   Sweden  -1584.4117  -9491.53684  1688.2543
-#> 138    7361757              Switzerland  -4802.2503  -9403.41919  1530.7907
-#> 139   67308928                   Turkey  12984.3184  11950.36291  4628.7252
-#> 140   59912431           United Kingdom  11335.0375 -11891.33843  4367.0034
-#> 141   19546792                Australia  -2494.3811      0.00000  2494.3811
-#> 142    3908037              New Zealand   1115.3326      0.00000  1115.3326
-#>     colour angle hjust vjust alpha family fontface lineheight
-#> 1    black     0   0.5   0.5   0.5               1        1.2
-#> 2    black     0   0.5   0.5   0.5               1        1.2
-#> 3    black     0   0.5   0.5   0.5               1        1.2
-#> 4    black     0   0.5   0.5   0.5               1        1.2
-#> 5    black     0   0.5   0.5   0.5               1        1.2
-#> 6    black     0   0.5   0.5   0.5               1        1.2
-#> 7    black     0   0.5   0.5   0.5               1        1.2
-#> 8    black     0   0.5   0.5   0.5               1        1.2
-#> 9    black     0   0.5   0.5   0.5               1        1.2
-#> 10   black     0   0.5   0.5   0.5               1        1.2
-#> 11   black     0   0.5   0.5   0.5               1        1.2
-#> 12   black     0   0.5   0.5   0.5               1        1.2
-#> 13   black     0   0.5   0.5   0.5               1        1.2
-#> 14   black     0   0.5   0.5   0.5               1        1.2
-#> 15   black     0   0.5   0.5   0.5               1        1.2
-#> 16   black     0   0.5   0.5   0.5               1        1.2
-#> 17   black     0   0.5   0.5   0.5               1        1.2
-#> 18   black     0   0.5   0.5   0.5               1        1.2
-#> 19   black     0   0.5   0.5   0.5               1        1.2
-#> 20   black     0   0.5   0.5   0.5               1        1.2
-#> 21   black     0   0.5   0.5   0.5               1        1.2
-#> 22   black     0   0.5   0.5   0.5               1        1.2
-#> 23   black     0   0.5   0.5   0.5               1        1.2
-#> 24   black     0   0.5   0.5   0.5               1        1.2
-#> 25   black     0   0.5   0.5   0.5               1        1.2
-#> 26   black     0   0.5   0.5   0.5               1        1.2
-#> 27   black     0   0.5   0.5   0.5               1        1.2
-#> 28   black     0   0.5   0.5   0.5               1        1.2
-#> 29   black     0   0.5   0.5   0.5               1        1.2
-#> 30   black     0   0.5   0.5   0.5               1        1.2
-#> 31   black     0   0.5   0.5   0.5               1        1.2
-#> 32   black     0   0.5   0.5   0.5               1        1.2
-#> 33   black     0   0.5   0.5   0.5               1        1.2
-#> 34   black     0   0.5   0.5   0.5               1        1.2
-#> 35   black     0   0.5   0.5   0.5               1        1.2
-#> 36   black     0   0.5   0.5   0.5               1        1.2
-#> 37   black     0   0.5   0.5   0.5               1        1.2
-#> 38   black     0   0.5   0.5   0.5               1        1.2
-#> 39   black     0   0.5   0.5   0.5               1        1.2
-#> 40   black     0   0.5   0.5   0.5               1        1.2
-#> 41   black     0   0.5   0.5   0.5               1        1.2
-#> 42   black     0   0.5   0.5   0.5               1        1.2
-#> 43   black     0   0.5   0.5   0.5               1        1.2
-#> 44   black     0   0.5   0.5   0.5               1        1.2
-#> 45   black     0   0.5   0.5   0.5               1        1.2
-#> 46   black     0   0.5   0.5   0.5               1        1.2
-#> 47   black     0   0.5   0.5   0.5               1        1.2
-#> 48   black     0   0.5   0.5   0.5               1        1.2
-#> 49   black     0   0.5   0.5   0.5               1        1.2
-#> 50   black     0   0.5   0.5   0.5               1        1.2
-#> 51   black     0   0.5   0.5   0.5               1        1.2
-#> 52   black     0   0.5   0.5   0.5               1        1.2
-#> 53   black     0   0.5   0.5   0.5               1        1.2
-#> 54   black     0   0.5   0.5   0.5               1        1.2
-#> 55   black     0   0.5   0.5   0.5               1        1.2
-#> 56   black     0   0.5   0.5   0.5               1        1.2
-#> 57   black     0   0.5   0.5   0.5               1        1.2
-#> 58   black     0   0.5   0.5   0.5               1        1.2
-#> 59   black     0   0.5   0.5   0.5               1        1.2
-#> 60   black     0   0.5   0.5   0.5               1        1.2
-#> 61   black     0   0.5   0.5   0.5               1        1.2
-#> 62   black     0   0.5   0.5   0.5               1        1.2
-#> 63   black     0   0.5   0.5   0.5               1        1.2
-#> 64   black     0   0.5   0.5   0.5               1        1.2
-#> 65   black     0   0.5   0.5   0.5               1        1.2
-#> 66   black     0   0.5   0.5   0.5               1        1.2
-#> 67   black     0   0.5   0.5   0.5               1        1.2
-#> 68   black     0   0.5   0.5   0.5               1        1.2
-#> 69   black     0   0.5   0.5   0.5               1        1.2
-#> 70   black     0   0.5   0.5   0.5               1        1.2
-#> 71   black     0   0.5   0.5   0.5               1        1.2
-#> 72   black     0   0.5   0.5   0.5               1        1.2
-#> 73   black     0   0.5   0.5   0.5               1        1.2
-#> 74   black     0   0.5   0.5   0.5               1        1.2
-#> 75   black     0   0.5   0.5   0.5               1        1.2
-#> 76   black     0   0.5   0.5   0.5               1        1.2
-#> 77   black     0   0.5   0.5   0.5               1        1.2
-#> 78   black     0   0.5   0.5   0.5               1        1.2
-#> 79   black     0   0.5   0.5   0.5               1        1.2
-#> 80   black     0   0.5   0.5   0.5               1        1.2
-#> 81   black     0   0.5   0.5   0.5               1        1.2
-#> 82   black     0   0.5   0.5   0.5               1        1.2
-#> 83   black     0   0.5   0.5   0.5               1        1.2
-#> 84   black     0   0.5   0.5   0.5               1        1.2
-#> 85   black     0   0.5   0.5   0.5               1        1.2
-#> 86   black     0   0.5   0.5   0.5               1        1.2
-#> 87   black     0   0.5   0.5   0.5               1        1.2
-#> 88   black     0   0.5   0.5   0.5               1        1.2
-#> 89   black     0   0.5   0.5   0.5               1        1.2
-#> 90   black     0   0.5   0.5   0.5               1        1.2
-#> 91   black     0   0.5   0.5   0.5               1        1.2
-#> 92   black     0   0.5   0.5   0.5               1        1.2
-#> 93   black     0   0.5   0.5   0.5               1        1.2
-#> 94   black     0   0.5   0.5   0.5               1        1.2
-#> 95   black     0   0.5   0.5   0.5               1        1.2
-#> 96   black     0   0.5   0.5   0.5               1        1.2
-#> 97   black     0   0.5   0.5   0.5               1        1.2
-#> 98   black     0   0.5   0.5   0.5               1        1.2
-#> 99   black     0   0.5   0.5   0.5               1        1.2
-#> 100  black     0   0.5   0.5   0.5               1        1.2
-#> 101  black     0   0.5   0.5   0.5               1        1.2
-#> 102  black     0   0.5   0.5   0.5               1        1.2
-#> 103  black     0   0.5   0.5   0.5               1        1.2
-#> 104  black     0   0.5   0.5   0.5               1        1.2
-#> 105  black     0   0.5   0.5   0.5               1        1.2
-#> 106  black     0   0.5   0.5   0.5               1        1.2
-#> 107  black     0   0.5   0.5   0.5               1        1.2
-#> 108  black     0   0.5   0.5   0.5               1        1.2
-#> 109  black     0   0.5   0.5   0.5               1        1.2
-#> 110  black     0   0.5   0.5   0.5               1        1.2
-#> 111  black     0   0.5   0.5   0.5               1        1.2
-#> 112  black     0   0.5   0.5   0.5               1        1.2
-#> 113  black     0   0.5   0.5   0.5               1        1.2
-#> 114  black     0   0.5   0.5   0.5               1        1.2
-#> 115  black     0   0.5   0.5   0.5               1        1.2
-#> 116  black     0   0.5   0.5   0.5               1        1.2
-#> 117  black     0   0.5   0.5   0.5               1        1.2
-#> 118  black     0   0.5   0.5   0.5               1        1.2
-#> 119  black     0   0.5   0.5   0.5               1        1.2
-#> 120  black     0   0.5   0.5   0.5               1        1.2
-#> 121  black     0   0.5   0.5   0.5               1        1.2
-#> 122  black     0   0.5   0.5   0.5               1        1.2
-#> 123  black     0   0.5   0.5   0.5               1        1.2
-#> 124  black     0   0.5   0.5   0.5               1        1.2
-#> 125  black     0   0.5   0.5   0.5               1        1.2
-#> 126  black     0   0.5   0.5   0.5               1        1.2
-#> 127  black     0   0.5   0.5   0.5               1        1.2
-#> 128  black     0   0.5   0.5   0.5               1        1.2
-#> 129  black     0   0.5   0.5   0.5               1        1.2
-#> 130  black     0   0.5   0.5   0.5               1        1.2
-#> 131  black     0   0.5   0.5   0.5               1        1.2
-#> 132  black     0   0.5   0.5   0.5               1        1.2
-#> 133  black     0   0.5   0.5   0.5               1        1.2
-#> 134  black     0   0.5   0.5   0.5               1        1.2
-#> 135  black     0   0.5   0.5   0.5               1        1.2
-#> 136  black     0   0.5   0.5   0.5               1        1.2
-#> 137  black     0   0.5   0.5   0.5               1        1.2
-#> 138  black     0   0.5   0.5   0.5               1        1.2
-#> 139  black     0   0.5   0.5   0.5               1        1.2
-#> 140  black     0   0.5   0.5   0.5               1        1.2
-#> 141  black     0   0.5   0.5   0.5               1        1.2
-#> 142  black     0   0.5   0.5   0.5               1        1.2
-```
-
 # Package the functions
 
 ``` r
@@ -973,12 +530,13 @@ tidytitanic::tidy_titanic %>%
   ggplot() + 
   aes(id = "all") + 
   geom_circlepack() +
-  geom_circlepack_text(aes(label = after_stat(area))) +
-  coord_equal()
+  geom_circlepack_text(aes(label = after_stat(area)), color = "gray85") +
+  coord_equal() + 
+  labs(title = "Titanic Passengers")
 #> Warning in geom_circlepack(): All aesthetics have length 1, but the data has 2201 rows.
 #> ℹ Please consider using `annotate()` or provide this layer with data containing
 #>   a single row.
-#> Warning in geom_circlepack_text(aes(label = after_stat(area))): All aesthetics have length 1, but the data has 2201 rows.
+#> Warning in geom_circlepack_text(aes(label = after_stat(area)), color = "gray85"): All aesthetics have length 1, but the data has 2201 rows.
 #> ℹ Please consider using `annotate()` or provide this layer with data containing
 #>   a single row.
 ```
@@ -987,45 +545,31 @@ tidytitanic::tidy_titanic %>%
 
 ``` r
 
+layer_data(i = 2)
+#> Warning in geom_circlepack(): All aesthetics have length 1, but the data has 2201 rows.
+#> ℹ Please consider using `annotate()` or provide this layer with data containing
+#>   a single row.
+#> All aesthetics have length 1, but the data has 2201 rows.
+#> ℹ Please consider using `annotate()` or provide this layer with data containing
+#>   a single row.
+#>       size label group PANEL  id         x y   radius area colour angle hjust
+#> 1 4.535534  2201   all     1 all -26.46885 0 26.46885 2201 gray85     0   0.5
+#>   vjust alpha family fontface lineheight
+#> 1   0.5    NA               1        1.2
+
+
 last_plot() +
-  aes(fill = sex) 
+  aes(fill = sex) +
+  scale_size(range = c(2.5, 6))
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-2.png" width="100%" />
 
 ``` r
 
-layer_data(i = 2)
-#>      fill size label group PANEL  id         x y   radius area colour angle
-#> 1 #F8766D    6  1731   all     1 all -23.47327 0 23.47327 1731  black     0
-#> 2 #00BFC4    1   470   all     1 all  12.23134 0 12.23134  470  black     0
-#>   hjust vjust alpha family fontface lineheight
-#> 1   0.5   0.5    NA               1        1.2
-#> 2   0.5   0.5    NA               1        1.2
-layer_data(i = 1)
-#>      fill group PANEL id          x             y area colour linewidth
-#> 1 #F8766D     1     1  1   0.000000  0.000000e+00 1731     NA       0.5
-#> 2 #F8766D     1     1  1 -35.209905  2.032845e+01 1731     NA       0.5
-#> 3 #F8766D     1     1  1 -35.209905 -2.032845e+01 1731     NA       0.5
-#> 4 #F8766D     1     1  1   0.000000 -5.749293e-15 1731     NA       0.5
-#> 5 #00BFC4     2     1  2  24.462677  0.000000e+00  470     NA       0.5
-#> 6 #00BFC4     2     1  2   6.115669  1.059265e+01  470     NA       0.5
-#> 7 #00BFC4     2     1  2   6.115669 -1.059265e+01  470     NA       0.5
-#> 8 #00BFC4     2     1  2  24.462677 -2.995814e-15  470     NA       0.5
-#>   linetype alpha
-#> 1        1    NA
-#> 2        1    NA
-#> 3        1    NA
-#> 4        1    NA
-#> 5        1    NA
-#> 6        1    NA
-#> 7        1    NA
-#> 8        1    NA
-
-
-
 last_plot() + 
-  aes(alpha = age) 
+  aes(alpha = survived) +
+  scale_alpha_discrete(range = c(.5,.9))
 #> Warning: Using alpha for a discrete variable is not advised.
 ```
 
@@ -1033,60 +577,8 @@ last_plot() +
 
 ``` r
 
-layer_data(i = 2)
-#> Warning: Using alpha for a discrete variable is not advised.
-#>   alpha    fill     size label group PANEL  id         x         y    radius
-#> 1   0.1 #F8766D 1.541155    64   all     1 all -4.513517   0.00000  4.513517
-#> 2   0.1 #00BFC4 1.000000    45   all     1 all  3.784699   0.00000  3.784699
-#> 3   1.0 #F8766D 6.000000  1667   all     1 all  2.023146 -26.76203 23.035246
-#> 4   1.0 #00BFC4 3.420117   425   all     1 all  1.021536  15.16611 11.631066
-#>   area colour angle hjust vjust family fontface lineheight
-#> 1   64  black     0   0.5   0.5               1        1.2
-#> 2   45  black     0   0.5   0.5               1        1.2
-#> 3 1667  black     0   0.5   0.5               1        1.2
-#> 4  425  black     0   0.5   0.5               1        1.2
-layer_data(i = 1)
-#> Warning: Using alpha for a discrete variable is not advised.
-#>    alpha    fill group PANEL id         x             y area colour linewidth
-#> 1    0.1 #F8766D     1     1  1  0.000000  0.000000e+00   64     NA       0.5
-#> 2    0.1 #F8766D     1     1  1 -6.770275  3.908820e+00   64     NA       0.5
-#> 3    0.1 #F8766D     1     1  1 -6.770275 -3.908820e+00   64     NA       0.5
-#> 4    0.1 #F8766D     1     1  1  0.000000 -1.105493e-15   64     NA       0.5
-#> 5    0.1 #00BFC4     2     1  2  7.569398  0.000000e+00   45     NA       0.5
-#> 6    0.1 #00BFC4     2     1  2  1.892349  3.277645e+00   45     NA       0.5
-#> 7    0.1 #00BFC4     2     1  2  1.892349 -3.277645e+00   45     NA       0.5
-#> 8    0.1 #00BFC4     2     1  2  7.569398 -9.269839e-16   45     NA       0.5
-#> 9    1.0 #F8766D     3     1  3 25.058392 -2.676203e+01 1667     NA       0.5
-#> 10   1.0 #F8766D     3     1  3 -9.494477 -6.812924e+00 1667     NA       0.5
-#> 11   1.0 #F8766D     3     1  3 -9.494477 -4.671114e+01 1667     NA       0.5
-#> 12   1.0 #F8766D     3     1  3 25.058392 -2.676203e+01 1667     NA       0.5
-#> 13   1.0 #00BFC4     4     1  4 12.652603  1.516611e+01  425     NA       0.5
-#> 14   1.0 #00BFC4     4     1  4 -4.793997  2.523890e+01  425     NA       0.5
-#> 15   1.0 #00BFC4     4     1  4 -4.793997  5.093306e+00  425     NA       0.5
-#> 16   1.0 #00BFC4     4     1  4 12.652603  1.516611e+01  425     NA       0.5
-#>    linetype
-#> 1         1
-#> 2         1
-#> 3         1
-#> 4         1
-#> 5         1
-#> 6         1
-#> 7         1
-#> 8         1
-#> 9         1
-#> 10        1
-#> 11        1
-#> 12        1
-#> 13        1
-#> 14        1
-#> 15        1
-#> 16        1
-
-
-
 last_plot() + 
-  aes(alpha = survived) 
-#> Warning: Using alpha for a discrete variable is not advised.
+  facet_wrap(~class)
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-4.png" width="100%" />
@@ -1094,205 +586,7 @@ last_plot() +
 ``` r
 
 last_plot() + 
-  facet_wrap(~class)
-#> Warning: Using alpha for a discrete variable is not advised.
+  facet_grid(age ~ class)
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-5.png" width="100%" />
-
-``` r
-
-layer_data(i = 2)
-#> Warning: Using alpha for a discrete variable is not advised.
-#>    alpha    fill     size label group PANEL  id          x          y    radius
-#> 1    0.1 #F8766D 3.076137   118   all     1 all  -6.128668   0.000000  6.128668
-#> 2    0.1 #00BFC4 1.193601     4   all     1 all   1.128379   0.000000  1.128379
-#> 3    1.0 #F8766D 2.487076    62   all     1 all   3.060949  -5.224857  4.442433
-#> 4    1.0 #00BFC4 3.274294   141   all     1 all   4.616042   7.007854  6.699380
-#> 5    0.1 #F8766D 3.379006   154   all     2 all  -7.001409   0.000000  7.001409
-#> 6    0.1 #00BFC4 1.612219    13   all     2 all   2.034214   0.000000  2.034214
-#> 7    1.0 #F8766D 1.908068    25   all     2 all   1.550773  -4.831034  2.820948
-#> 8    1.0 #00BFC4 2.836658    93   all     2 all   2.991022   7.413573  5.440847
-#> 9    0.1 #F8766D 4.962909   422   all     3 all -11.589943   0.000000 11.589943
-#> 10   0.1 #00BFC4 2.964833   106   all     3 all   5.808687   0.000000  5.808687
-#> 11   1.0 #F8766D 2.784911    88   all     3 all   1.758626 -10.336095  5.292567
-#> 12   1.0 #00BFC4 2.805788    90   all     3 all   1.778498  10.408017  5.352372
-#> 13   0.1 #F8766D 6.000000   670   all     4 all -14.603685   0.000000 14.603685
-#> 14   0.1 #00BFC4 1.000000     3   all     4 all   0.977205   0.000000  0.977205
-#> 15   1.0 #F8766D 3.661571   192   all     4 all   6.837024  -6.558340  7.817640
-#> 16   1.0 #00BFC4 1.798236    20   all     4 all   2.206640   3.277324  2.523133
-#>    area colour angle hjust vjust family fontface lineheight
-#> 1   118  black     0   0.5   0.5               1        1.2
-#> 2     4  black     0   0.5   0.5               1        1.2
-#> 3    62  black     0   0.5   0.5               1        1.2
-#> 4   141  black     0   0.5   0.5               1        1.2
-#> 5   154  black     0   0.5   0.5               1        1.2
-#> 6    13  black     0   0.5   0.5               1        1.2
-#> 7    25  black     0   0.5   0.5               1        1.2
-#> 8    93  black     0   0.5   0.5               1        1.2
-#> 9   422  black     0   0.5   0.5               1        1.2
-#> 10  106  black     0   0.5   0.5               1        1.2
-#> 11   88  black     0   0.5   0.5               1        1.2
-#> 12   90  black     0   0.5   0.5               1        1.2
-#> 13  670  black     0   0.5   0.5               1        1.2
-#> 14    3  black     0   0.5   0.5               1        1.2
-#> 15  192  black     0   0.5   0.5               1        1.2
-#> 16   20  black     0   0.5   0.5               1        1.2
-layer_data(i = 1)
-#> Warning: Using alpha for a discrete variable is not advised.
-#>    alpha    fill group PANEL id           x             y area colour linewidth
-#> 1    0.1 #F8766D     1     1  1   0.0000000  0.000000e+00  118     NA       0.5
-#> 2    0.1 #F8766D     1     1  1  -9.1930014  5.307582e+00  118     NA       0.5
-#> 3    0.1 #F8766D     1     1  1  -9.1930014 -5.307582e+00  118     NA       0.5
-#> 4    0.1 #F8766D     1     1  1   0.0000000 -1.501091e-15  118     NA       0.5
-#> 5    0.1 #00BFC4     2     1  2   2.2567583  0.000000e+00    4     NA       0.5
-#> 6    0.1 #00BFC4     2     1  2   0.5641896  9.772050e-01    4     NA       0.5
-#> 7    0.1 #00BFC4     2     1  2   0.5641896 -9.772050e-01    4     NA       0.5
-#> 8    0.1 #00BFC4     2     1  2   2.2567583 -2.763732e-16    4     NA       0.5
-#> 9    1.0 #F8766D     3     1  3   7.5033819 -5.224857e+00   62     NA       0.5
-#> 10   1.0 #F8766D     3     1  3   0.8397320 -1.377597e+00   62     NA       0.5
-#> 11   1.0 #F8766D     3     1  3   0.8397320 -9.072117e+00   62     NA       0.5
-#> 12   1.0 #F8766D     3     1  3   7.5033819 -5.224857e+00   62     NA       0.5
-#> 13   1.0 #00BFC4     4     1  4  11.3154221  7.007854e+00  141     NA       0.5
-#> 14   1.0 #00BFC4     4     1  4   1.2663520  1.280969e+01  141     NA       0.5
-#> 15   1.0 #00BFC4     4     1  4   1.2663520  1.206021e+00  141     NA       0.5
-#> 16   1.0 #00BFC4     4     1  4  11.3154221  7.007854e+00  141     NA       0.5
-#> 17   0.1 #F8766D     1     2  1   0.0000000  0.000000e+00  154     NA       0.5
-#> 18   0.1 #F8766D     1     2  1 -10.5021129  6.063398e+00  154     NA       0.5
-#> 19   0.1 #F8766D     1     2  1 -10.5021129 -6.063398e+00  154     NA       0.5
-#> 20   0.1 #F8766D     1     2  1   0.0000000 -1.714851e-15  154     NA       0.5
-#> 21   0.1 #00BFC4     2     2  2   4.0684289  0.000000e+00   13     NA       0.5
-#> 22   0.1 #00BFC4     2     2  2   1.0171072  1.761681e+00   13     NA       0.5
-#> 23   0.1 #00BFC4     2     2  2   1.0171072 -1.761681e+00   13     NA       0.5
-#> 24   0.1 #00BFC4     2     2  2   4.0684289 -4.982388e-16   13     NA       0.5
-#> 25   1.0 #F8766D     3     2  3   4.3717204 -4.831034e+00   25     NA       0.5
-#> 26   1.0 #F8766D     3     2  3   0.1402986 -2.388021e+00   25     NA       0.5
-#> 27   1.0 #F8766D     3     2  3   0.1402986 -7.274046e+00   25     NA       0.5
-#> 28   1.0 #F8766D     3     2  3   4.3717204 -4.831034e+00   25     NA       0.5
-#> 29   1.0 #00BFC4     4     2  4   8.4318690  7.413573e+00   93     NA       0.5
-#> 30   1.0 #00BFC4     4     2  4   0.2705981  1.212549e+01   93     NA       0.5
-#> 31   1.0 #00BFC4     4     2  4   0.2705981  2.701661e+00   93     NA       0.5
-#> 32   1.0 #00BFC4     4     2  4   8.4318690  7.413573e+00   93     NA       0.5
-#> 33   0.1 #F8766D     1     3  1   0.0000000  0.000000e+00  422     NA       0.5
-#> 34   0.1 #F8766D     1     3  1 -17.3849141  1.003718e+01  422     NA       0.5
-#> 35   0.1 #F8766D     1     3  1 -17.3849141 -1.003718e+01  422     NA       0.5
-#> 36   0.1 #F8766D     1     3  1   0.0000000 -2.838717e-15  422     NA       0.5
-#> 37   0.1 #00BFC4     2     3  2  11.6173746  0.000000e+00  106     NA       0.5
-#> 38   0.1 #00BFC4     2     3  2   2.9043436  5.030471e+00  106     NA       0.5
-#> 39   0.1 #00BFC4     2     3  2   2.9043436 -5.030471e+00  106     NA       0.5
-#> 40   0.1 #00BFC4     2     3  2  11.6173746 -1.422718e-15  106     NA       0.5
-#> 41   1.0 #F8766D     3     3  3   7.0511935 -1.033610e+01   88     NA       0.5
-#> 42   1.0 #F8766D     3     3  3  -0.8876577 -5.752597e+00   88     NA       0.5
-#> 43   1.0 #F8766D     3     3  3  -0.8876577 -1.491959e+01   88     NA       0.5
-#> 44   1.0 #F8766D     3     3  3   7.0511935 -1.033610e+01   88     NA       0.5
-#> 45   1.0 #00BFC4     4     3  4   7.1308705  1.040802e+01   90     NA       0.5
-#> 46   1.0 #00BFC4     4     3  4  -0.8976880  1.504331e+01   90     NA       0.5
-#> 47   1.0 #00BFC4     4     3  4  -0.8976880  5.772727e+00   90     NA       0.5
-#> 48   1.0 #00BFC4     4     3  4   7.1308705  1.040802e+01   90     NA       0.5
-#> 49   0.1 #F8766D     1     4  1   0.0000000  0.000000e+00  670     NA       0.5
-#> 50   0.1 #F8766D     1     4  1 -21.9055279  1.264716e+01  670     NA       0.5
-#> 51   0.1 #F8766D     1     4  1 -21.9055279 -1.264716e+01  670     NA       0.5
-#> 52   0.1 #F8766D     1     4  1   0.0000000 -3.576871e-15  670     NA       0.5
-#> 53   0.1 #00BFC4     2     4  2   1.9544100  0.000000e+00    3     NA       0.5
-#> 54   0.1 #00BFC4     2     4  2   0.4886025  8.462844e-01    3     NA       0.5
-#> 55   0.1 #00BFC4     2     4  2   0.4886025 -8.462844e-01    3     NA       0.5
-#> 56   0.1 #00BFC4     2     4  2   1.9544100 -2.393462e-16    3     NA       0.5
-#> 57   1.0 #F8766D     3     4  3  14.6546641 -6.558340e+00  192     NA       0.5
-#> 58   1.0 #F8766D     3     4  3   2.9282038  2.119349e-01  192     NA       0.5
-#> 59   1.0 #F8766D     3     4  3   2.9282038 -1.332862e+01  192     NA       0.5
-#> 60   1.0 #F8766D     3     4  3  14.6546641 -6.558340e+00  192     NA       0.5
-#> 61   1.0 #00BFC4     4     4  4   4.7297725  3.277324e+00   20     NA       0.5
-#> 62   1.0 #00BFC4     4     4  4   0.9450737  5.462421e+00   20     NA       0.5
-#> 63   1.0 #00BFC4     4     4  4   0.9450737  1.092227e+00   20     NA       0.5
-#> 64   1.0 #00BFC4     4     4  4   4.7297725  3.277324e+00   20     NA       0.5
-#>    linetype
-#> 1         1
-#> 2         1
-#> 3         1
-#> 4         1
-#> 5         1
-#> 6         1
-#> 7         1
-#> 8         1
-#> 9         1
-#> 10        1
-#> 11        1
-#> 12        1
-#> 13        1
-#> 14        1
-#> 15        1
-#> 16        1
-#> 17        1
-#> 18        1
-#> 19        1
-#> 20        1
-#> 21        1
-#> 22        1
-#> 23        1
-#> 24        1
-#> 25        1
-#> 26        1
-#> 27        1
-#> 28        1
-#> 29        1
-#> 30        1
-#> 31        1
-#> 32        1
-#> 33        1
-#> 34        1
-#> 35        1
-#> 36        1
-#> 37        1
-#> 38        1
-#> 39        1
-#> 40        1
-#> 41        1
-#> 42        1
-#> 43        1
-#> 44        1
-#> 45        1
-#> 46        1
-#> 47        1
-#> 48        1
-#> 49        1
-#> 50        1
-#> 51        1
-#> 52        1
-#> 53        1
-#> 54        1
-#> 55        1
-#> 56        1
-#> 57        1
-#> 58        1
-#> 59        1
-#> 60        1
-#> 61        1
-#> 62        1
-#> 63        1
-#> 64        1
-
-
-tidytitanic::tidy_titanic %>% 
-  count(sex, survived, class)
-#>       sex survived class   n
-#> 1    Male       No   1st 118
-#> 2    Male       No   2nd 154
-#> 3    Male       No   3rd 422
-#> 4    Male       No  Crew 670
-#> 5    Male      Yes   1st  62
-#> 6    Male      Yes   2nd  25
-#> 7    Male      Yes   3rd  88
-#> 8    Male      Yes  Crew 192
-#> 9  Female       No   1st   4
-#> 10 Female       No   2nd  13
-#> 11 Female       No   3rd 106
-#> 12 Female       No  Crew   3
-#> 13 Female      Yes   1st 141
-#> 14 Female      Yes   2nd  93
-#> 15 Female      Yes   3rd  90
-#> 16 Female      Yes  Crew  20
-```
-
-## Quiet the joins.
-
-## create a ggcirclepack()/defaults\_circlepack() function for preferred defaults.

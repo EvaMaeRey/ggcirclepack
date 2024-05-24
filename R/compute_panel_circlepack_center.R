@@ -21,8 +21,8 @@ compute_panel_circlepack_center <- function(data, scales){
   
   data %>% 
     count(wt = area) %>% 
-    # ungroup() %>% 
-    # arrange(id) %>% # this doesn't feel very principled
+    # ungroup() %>%
+    arrange(id) %>% # this doesn't feel very principled; motivation is when you go from no fill to color, preserves circle position...
     rename(area = n) ->
   data
 

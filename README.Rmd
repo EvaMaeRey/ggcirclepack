@@ -118,8 +118,8 @@ compute_panel_circlepack_center <- function(data, scales){
   
   data %>% 
     count(wt = area) %>% 
-    # ungroup() %>% 
-    # arrange(id) %>% # this doesn't feel very principled
+    # ungroup() %>%
+    arrange(id) %>% # this doesn't feel very principled; motivation is when you go from no fill to color, preserves circle position...
     rename(area = n) ->
   data
 
@@ -228,7 +228,7 @@ filter(year == 2002) %>%
 #'
 #' @examples
 #' TBD
-compute_panel_circlepack <- function(data, scales, npoints = 3){
+compute_panel_circlepack <- function(data, scales, npoints = 50){
 
   data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 
                                              "colour", "group", "linewidth", 
@@ -242,11 +242,8 @@ compute_panel_circlepack <- function(data, scales, npoints = 3){
   
   data %>% 
     count(wt = area) %>% 
-    ungroup() %>% 
-    ungroup() %>% 
-    ungroup() %>% 
-    ungroup() %>% 
-    # arrange(id) %>%  # this doesn't feel very principled
+    # ungroup() %>%
+    arrange(id) %>%  # this doesn't feel very principled
     rename(area = n) ->
   data
 
@@ -368,7 +365,6 @@ filter(year == 2002) %>%
     paste(id, "\n",
     round(area/1000000, 1), "mil."))), lineheight = .8)
 
-
 gapminder::gapminder %>%
 filter(year == 2002) %>%
   ggplot() +
@@ -388,8 +384,6 @@ last_plot() +
 last_plot() + 
   facet_wrap(~continent)
 
-
-layer_data(i = 2)
 ```
 
 
@@ -425,45 +419,26 @@ tidytitanic::tidy_titanic %>%
   ggplot() + 
   aes(id = "all") + 
   geom_circlepack() +
-  geom_circlepack_text(aes(label = after_stat(area))) +
-  coord_equal()
+  geom_circlepack_text(aes(label = after_stat(area)), color = "gray85") +
+  coord_equal() + 
+  labs(title = "Titanic Passengers")
+
+layer_data(i = 2)
+
 
 last_plot() +
-  aes(fill = sex) 
-
-layer_data(i = 2)
-layer_data(i = 1)
-
-
+  aes(fill = sex) +
+  scale_size(range = c(2.5, 6))
 
 last_plot() + 
-  aes(alpha = age) 
-
-layer_data(i = 2)
-layer_data(i = 1)
-
-
-
-last_plot() + 
-  aes(alpha = survived) 
+  aes(alpha = survived) +
+  scale_alpha_discrete(range = c(.5,.9))
 
 last_plot() + 
   facet_wrap(~class)
 
-layer_data(i = 2)
-layer_data(i = 1)
-
-
-tidytitanic::tidy_titanic %>% 
-  count(sex, survived, class)
-```
-
-## Quiet the joins.
-## create a ggcirclepack()/defaults_circlepack() function for preferred defaults.
-
-
-```{r}
-
+last_plot() + 
+  facet_grid(age ~ class)
 
 ```
 
