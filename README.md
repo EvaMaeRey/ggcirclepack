@@ -530,13 +530,13 @@ tidytitanic::tidy_titanic %>%
   ggplot() + 
   aes(id = "all") + 
   geom_circlepack() +
-  geom_circlepack_text(aes(label = after_stat(area)), color = "gray85") +
+  geom_circlepack_text(aes(label = after_stat(area)), color = "gray50") +
   coord_equal() + 
   labs(title = "Titanic Passengers")
 #> Warning in geom_circlepack(): All aesthetics have length 1, but the data has 2201 rows.
 #> ℹ Please consider using `annotate()` or provide this layer with data containing
 #>   a single row.
-#> Warning in geom_circlepack_text(aes(label = after_stat(area)), color = "gray85"): All aesthetics have length 1, but the data has 2201 rows.
+#> Warning in geom_circlepack_text(aes(label = after_stat(area)), color = "gray50"): All aesthetics have length 1, but the data has 2201 rows.
 #> ℹ Please consider using `annotate()` or provide this layer with data containing
 #>   a single row.
 ```
@@ -553,14 +553,14 @@ layer_data(i = 2)
 #> ℹ Please consider using `annotate()` or provide this layer with data containing
 #>   a single row.
 #>       size label group PANEL  id         x y   radius area colour angle hjust
-#> 1 4.535534  2201   all     1 all -26.46885 0 26.46885 2201 gray85     0   0.5
+#> 1 4.535534  2201   all     1 all -26.46885 0 26.46885 2201 gray50     0   0.5
 #>   vjust alpha family fontface lineheight
 #> 1   0.5    NA               1        1.2
 
 
 last_plot() +
   aes(fill = sex) +
-  scale_size(range = c(2.5, 6))
+  scale_size(range = c(3, 6))
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-2.png" width="100%" />
