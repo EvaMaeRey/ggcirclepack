@@ -136,6 +136,7 @@ compute_panel_circlepack_center <- function(data, scales){
                                              "linetype")]
   
   if(is.null(data$area)){data$area <- 1}
+  data$value <- data$area
   
   data %>% 
     group_by(across(data_mapped_aes_names)) ->
@@ -510,6 +511,7 @@ knitrExtra:::chunk_to_r(chunk_name = "geom_circlepack_text")
 ```
 
 ``` r
+devtools::document()
 devtools::check()
 devtools::install(pkg = ".", upgrade = "never") 
 ```
@@ -569,7 +571,7 @@ last_plot() +
 
 last_plot() + 
   aes(alpha = survived) +
-  scale_alpha_discrete(range = c(.5,.9))
+  scale_alpha_discrete(range = c(.6,.9))
 #> Warning: Using alpha for a discrete variable is not advised.
 ```
 

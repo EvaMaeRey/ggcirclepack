@@ -14,6 +14,7 @@ compute_panel_circlepack_center <- function(data, scales){
                                              "linetype")]
   
   if(is.null(data$area)){data$area <- 1}
+  data$value <- data$area
   
   data %>% 
     group_by(across(data_mapped_aes_names)) ->
