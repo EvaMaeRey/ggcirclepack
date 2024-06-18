@@ -20,6 +20,3 @@ geom_circlepack(
 \description{
 Title
 }
-\examples{
-# TBD
-}

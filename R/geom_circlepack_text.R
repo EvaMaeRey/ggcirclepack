@@ -22,7 +22,6 @@ StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
 #' @export
 #'
 #' @examples
-#' # TBD
 geom_circlepack_text <- function(mapping = NULL, data = NULL,
                            position = "identity", na.rm = FALSE,
                            show.legend = NA,

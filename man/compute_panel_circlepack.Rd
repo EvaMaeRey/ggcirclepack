@@ -12,6 +12,3 @@ compute_panel_circlepack(data, scales, npoints = 50)
 \description{
 compute_panel_circlepack
 }
-\examples{
-TBD
-}

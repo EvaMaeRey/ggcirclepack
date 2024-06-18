@@ -19,7 +19,6 @@ StatCirclepack <- ggplot2::ggproto(`_class` = "StatCirclepack",
 #' @export
 #'
 #' @examples
-#' # TBD
 geom_circlepack <- function(mapping = NULL, data = NULL,
                            position = "identity", na.rm = FALSE,
                            show.legend = NA,

@@ -4,14 +4,13 @@
 #' @export
 #'
 #' @examples
-#' # TBD
 compute_panel_circlepack_center <- function(data, scales){
 
   # get aes names as they appear in the data
   data_mapped_aes_names <- names(data)[names(data) %in% 
                                          c("id", "fill", "alpha", 
                                              "colour", "group", "linewidth", 
-                                             "linetype")]
+                                             "linetype", "render")]
   
   if(is.null(data$area)){data$area <- 1}
   data$value <- data$area
@@ -31,6 +30,17 @@ compute_panel_circlepack_center <- function(data, scales){
     pull(area) %>%
     packcircles::circleProgressiveLayout(
       sizetype = 'area') %>%
-    cbind(data) 
-
+    cbind(data) ->
+  data
+  
+  if(!is.null(data$render)){
+    
+    data %>% 
+      filter(.data$render) ->
+    data
+    
+  }
+  
+  data
 }
+

@@ -1,9 +1,9 @@
 
   - [ggcirclepack](#ggcirclepack)
       - [Note to the reader](#note-to-the-reader)
-  - [status quo w/o {ggcirclepack}: precomputation required to two more
-    data
-    frames](#status-quo-wo-ggcirclepack-precomputation-required-to-two-more-data-frames)
+  - [status quo *without* {ggcirclepack}: precomputation required to
+    create two more data
+    frames](#status-quo-without-ggcirclepack-precomputation-required-to-create-two-more-data-frames)
   - [Proposed UI](#proposed-ui)
   - [Package functions](#package-functions)
       - [geom\_circlepack\_text (center)](#geom_circlepack_text-center)
@@ -52,7 +52,7 @@ questions…
   - Is there rewriting that could make the code more concise?
   - What tests should be performed?
 
-# status quo w/o {ggcirclepack}: precomputation required to two more data frames
+# status quo *without* {ggcirclepack}: precomputation required to create two more data frames
 
 ``` r
 library(tidyverse)
@@ -126,14 +126,13 @@ filter(year == 2002) %>%
 #' @export
 #'
 #' @examples
-#' # TBD
 compute_panel_circlepack_center <- function(data, scales){
 
   # get aes names as they appear in the data
   data_mapped_aes_names <- names(data)[names(data) %in% 
                                          c("id", "fill", "alpha", 
                                              "colour", "group", "linewidth", 
-                                             "linetype")]
+                                             "linetype", "render")]
   
   if(is.null(data$area)){data$area <- 1}
   data$value <- data$area
@@ -153,8 +152,18 @@ compute_panel_circlepack_center <- function(data, scales){
     pull(area) %>%
     packcircles::circleProgressiveLayout(
       sizetype = 'area') %>%
-    cbind(data) 
-
+    cbind(data) ->
+  data
+  
+  if(!is.null(data$render)){
+    
+    data %>% 
+      filter(.data$render) ->
+    data
+    
+  }
+  
+  data
 }
 ```
 
@@ -199,6 +208,15 @@ gapminder::gapminder %>%
 #> 3  0.5868621 -5.635277 3.2410224     Asia   33
 #> 4  0.5595510  5.461472 3.0901936   Europe   30
 #> 5  3.8910939  3.456984 0.7978846  Oceania    2
+
+gapminder::gapminder %>% 
+  filter(year == 2002) %>% 
+  mutate( render = country == "Argentina") %>% 
+  select(id = continent, render) %>% 
+  compute_panel_circlepack_center()
+#> Warning: Unknown or uninitialised column: `area`.
+#>           x         y    radius       id render area
+#> 1 0.1077182 -2.005231 0.5641896 Americas   TRUE    1
 ```
 
 ### Step 2 and 3 ggproto and geom
@@ -228,7 +246,6 @@ StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
 #' @export
 #'
 #' @examples
-#' # TBD
 geom_circlepack_text <- function(mapping = NULL, data = NULL,
                            position = "identity", na.rm = FALSE,
                            show.legend = NA,
@@ -260,6 +277,14 @@ filter(year == 2002) %>%
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
+``` r
+
+last_plot() + 
+  aes(render = pop > 20000000)
+```
+
+<img src="man/figures/README-unnamed-chunk-4-2.png" width="100%" />
+
 ## geom\_circlepack
 
 ### Step 1. compute\_panel
@@ -275,7 +300,6 @@ filter(year == 2002) %>%
 #' @export
 #'
 #' @examples
-#' TBD
 compute_panel_circlepack <- function(data, scales, npoints = 50){
 
   data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 
@@ -350,7 +374,6 @@ StatCirclepack <- ggplot2::ggproto(`_class` = "StatCirclepack",
 #' @export
 #'
 #' @examples
-#' # TBD
 geom_circlepack <- function(mapping = NULL, data = NULL,
                            position = "identity", na.rm = FALSE,
                            show.legend = NA,
@@ -496,6 +519,42 @@ last_plot() +
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-12.png" width="100%" />
+
+``` r
+
+
+gapminder::gapminder %>%
+filter(year == 2002) %>%
+  ggplot() +
+  aes(id = country) + 
+  geom_circlepack() +
+  geom_circlepack_text(alpha = .5) +
+  aes(area = pop) + 
+  coord_equal() + 
+  aes(fill = continent) + 
+  aes(render = pop > 20000000)
+```
+
+<img src="man/figures/README-unnamed-chunk-6-13.png" width="100%" />
+
+``` r
+
+# GeomTextRepel
+gapminder::gapminder %>%
+filter(year == 2002) %>%
+  ggplot() +
+  aes(id = country) + 
+  geom_circlepack() +
+  layer(geom = ggrepel::GeomTextRepel, 
+        stat = StatCirclepackcenter, 
+        position = "identity") +
+  aes(area = pop) + 
+  coord_equal() + 
+  aes(fill = continent) + 
+  aes(render = pop > 20000000)
+```
+
+<img src="man/figures/README-unnamed-chunk-6-14.png" width="100%" />
 
 # Package the functions
 

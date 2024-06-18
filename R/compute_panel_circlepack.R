@@ -8,7 +8,6 @@
 #' @export
 #'
 #' @examples
-#' TBD
 compute_panel_circlepack <- function(data, scales, npoints = 50){
 
   data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 

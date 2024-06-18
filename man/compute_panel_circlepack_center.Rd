@@ -9,6 +9,3 @@ compute_panel_circlepack_center(data, scales)
 \description{
 compute_panel_circlepack_center
 }
-\examples{
-# TBD
-}
