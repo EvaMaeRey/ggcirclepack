@@ -106,7 +106,7 @@ compute_panel_circlepack_center <- function(data, scales){
   # get aes names as they appear in the data
   data_mapped_aes_names <- names(data)[names(data) %in% 
                                          c("id", "fill", "alpha", 
-                                             "colour", "group", "linewidth", 
+                                             "colour", "group", "linewidth", "label",
                                              "linetype", "render")]
   
   if(is.null(data$area)){data$area <- 1}
@@ -133,7 +133,13 @@ compute_panel_circlepack_center <- function(data, scales){
   if(!is.null(data$render)){
     
     data %>% 
-      filter(.data$render) ->
+      mutate(auto_label = ifelse(.data$render, as.character(.data$id), NA)) ->
+    data
+    
+  }else{
+    
+    data %>% 
+      mutate(auto_label = id) ->
     data
     
   }
@@ -176,7 +182,7 @@ StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
                                   compute_panel = compute_panel_circlepack_center,
                                   default_aes = ggplot2::aes(group = after_stat(id),
                                                              size = after_stat(area),
-                                                             label = after_stat(id))
+                                                             label = after_stat(auto_label))
                                   )
 
 
@@ -267,7 +273,7 @@ last_plot() +
 #' @examples
 compute_panel_circlepack <- function(data, scales, npoints = 50){
 
-  data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 
+  data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", "label",
                                              "colour", "group", "linewidth", 
                                              "linetype")]
   

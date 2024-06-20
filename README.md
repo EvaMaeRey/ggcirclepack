@@ -134,7 +134,7 @@ compute_panel_circlepack_center <- function(data, scales){
   # get aes names as they appear in the data
   data_mapped_aes_names <- names(data)[names(data) %in% 
                                          c("id", "fill", "alpha", 
-                                             "colour", "group", "linewidth", 
+                                             "colour", "group", "linewidth", "label",
                                              "linetype", "render")]
   
   if(is.null(data$area)){data$area <- 1}
@@ -161,7 +161,13 @@ compute_panel_circlepack_center <- function(data, scales){
   if(!is.null(data$render)){
     
     data %>% 
-      filter(.data$render) ->
+      mutate(auto_label = ifelse(.data$render, as.character(.data$id), NA)) ->
+    data
+    
+  }else{
+    
+    data %>% 
+      mutate(auto_label = id) ->
     data
     
   }
@@ -192,13 +198,13 @@ filter(continent == "Americas") %>%
 #>   data %>% select(all_of(data_mapped_aes_names))
 #> 
 #> See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.
-#>           x         y   radius        id      area
-#> 1 -3493.018     0.000 3493.018 Argentina  38331121
-#> 2  1639.564     0.000 1639.564   Bolivia   8445134
-#> 3  2732.774 -9142.026 7567.594    Brazil 179914212
-#> 4  1150.752  4801.407 3186.661    Canada  31902268
-#> 5  5273.817  1302.381 2221.005     Chile  15497046
-#> 6 10562.330 -1160.651 3612.938  Colombia  41008227
+#>           x         y   radius        id      area auto_label
+#> 1 -3493.018     0.000 3493.018 Argentina  38331121  Argentina
+#> 2  1639.564     0.000 1639.564   Bolivia   8445134    Bolivia
+#> 3  2732.774 -9142.026 7567.594    Brazil 179914212     Brazil
+#> 4  1150.752  4801.407 3186.661    Canada  31902268     Canada
+#> 5  5273.817  1302.381 2221.005     Chile  15497046      Chile
+#> 6 10562.330 -1160.651 3612.938  Colombia  41008227   Colombia
 ```
 
 ``` r
@@ -208,12 +214,12 @@ gapminder::gapminder %>%
   select(id = continent) %>% 
   compute_panel_circlepack_center()
 #> Warning: Unknown or uninitialised column: `area`.
-#>            x         y    radius       id area
-#> 1 -4.0684289  0.000000 4.0684289   Africa   52
-#> 2  2.8209479  0.000000 2.8209479 Americas   25
-#> 3  0.5868621 -5.635277 3.2410224     Asia   33
-#> 4  0.5595510  5.461472 3.0901936   Europe   30
-#> 5  3.8910939  3.456984 0.7978846  Oceania    2
+#>            x         y    radius       id area auto_label
+#> 1 -4.0684289  0.000000 4.0684289   Africa   52     Africa
+#> 2  2.8209479  0.000000 2.8209479 Americas   25   Americas
+#> 3  0.5868621 -5.635277 3.2410224     Asia   33       Asia
+#> 4  0.5595510  5.461472 3.0901936   Europe   30     Europe
+#> 5  3.8910939  3.456984 0.7978846  Oceania    2    Oceania
 ```
 
 ``` r
@@ -224,8 +230,13 @@ gapminder::gapminder %>%
   select(id = continent, render) %>% 
   compute_panel_circlepack_center()
 #> Warning: Unknown or uninitialised column: `area`.
-#>           x         y    radius       id render area
-#> 1 0.1077182 -2.005231 0.5641896 Americas   TRUE    1
+#>            x         y    radius       id render area auto_label
+#> 1 -4.0684289  0.000000 4.0684289   Africa  FALSE   52       <NA>
+#> 2  2.7639532  0.000000 2.7639532 Americas  FALSE   24       <NA>
+#> 3  0.1077182 -2.005231 0.5641896 Americas   TRUE    1   Americas
+#> 4  0.9345431 -5.719527 3.2410224     Asia  FALSE   33       <NA>
+#> 5 -5.2531607 -7.059907 3.0901936   Europe  FALSE   30       <NA>
+#> 6  0.1523365  2.422013 0.7978846  Oceania  FALSE    2       <NA>
 ```
 
 ### Step 2 and 3 ggproto and geom
@@ -237,7 +248,7 @@ StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
                                   compute_panel = compute_panel_circlepack_center,
                                   default_aes = ggplot2::aes(group = after_stat(id),
                                                              size = after_stat(area),
-                                                             label = after_stat(id))
+                                                             label = after_stat(auto_label))
                                   )
 
 
@@ -308,6 +319,8 @@ filter(year == 2002) %>%
 
 last_plot() + 
   aes(render = pop > 20000000)
+#> Warning: Removed 95 rows containing missing values or values outside the scale range
+#> (`geom_text()`).
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-2.png" width="100%" />
@@ -329,7 +342,7 @@ last_plot() +
 #' @examples
 compute_panel_circlepack <- function(data, scales, npoints = 50){
 
-  data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", 
+  data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", "label",
                                              "colour", "group", "linewidth", 
                                              "linetype")]
   
@@ -560,6 +573,8 @@ filter(year == 2002) %>%
   coord_equal() + 
   aes(fill = continent) + 
   aes(render = pop > 20000000)
+#> Warning: Removed 95 rows containing missing values or values outside the scale range
+#> (`geom_text()`).
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-13.png" width="100%" />
@@ -579,6 +594,8 @@ filter(year == 2002) %>%
   coord_equal() + 
   aes(fill = continent) + 
   aes(render = pop > 20000000)
+#> Warning: Removed 95 rows containing missing values or values outside the scale range
+#> (`geom_text_repel()`).
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-14.png" width="100%" />
@@ -649,10 +666,10 @@ layer_data(i = 2)
 #> All aesthetics have length 1, but the data has 2201 rows.
 #> ℹ Please consider using `annotate()` or provide this layer with data containing
 #>   a single row.
-#>       size label group PANEL  id         x y   radius area colour angle hjust
-#> 1 4.535534  2201   all     1 all -26.46885 0 26.46885 2201 gray50     0   0.5
-#>   vjust alpha family fontface lineheight
-#> 1   0.5    NA               1        1.2
+#>       size label group PANEL  id         x y   radius area auto_label colour
+#> 1 4.535534  2201   all     1 all -26.46885 0 26.46885 2201        all gray50
+#>   angle hjust vjust alpha family fontface lineheight
+#> 1     0   0.5   0.5    NA               1        1.2
 ```
 
 ``` r
