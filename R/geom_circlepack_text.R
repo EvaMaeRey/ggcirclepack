@@ -22,13 +22,14 @@ StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
 #' @export
 #'
 #' @examples
-geom_circlepack_text <- function(mapping = NULL, data = NULL,
+stat_circlepack_center <- function(mapping = NULL, data = NULL,
+                                 geom = "text",
                            position = "identity", na.rm = FALSE,
                            show.legend = NA,
                            inherit.aes = TRUE, ...) {
   ggplot2::layer(
+    geom = geom, # inherit other behavior
     stat = StatCirclepackcenter, # proto object from Step 2
-    geom = ggplot2::GeomText, # inherit other behavior
     data = data,
     mapping = mapping,
     position = position,
@@ -37,3 +38,21 @@ geom_circlepack_text <- function(mapping = NULL, data = NULL,
     params = list(na.rm = na.rm, ...)
   )
 }
+
+
+#' Title
+#'
+#' @param mapping
+#' @param data
+#' @param position
+#' @param na.rm
+#' @param show.legend
+#' @param inherit.aes
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+geom_circlepack_text <- stat_circlepack_center
+

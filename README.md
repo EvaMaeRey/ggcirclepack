@@ -66,6 +66,9 @@ library(tidyverse)
 #> ✖ dplyr::filter() masks stats::filter()
 #> ✖ dplyr::lag()    masks stats::lag()
 #> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+```
+
+``` r
 gapminder::gapminder %>%  
   filter(continent == "Americas") %>%  
   filter(year == 2002) %>%  
@@ -196,6 +199,9 @@ filter(continent == "Americas") %>%
 #> 4  1150.752  4801.407 3186.661    Canada  31902268
 #> 5  5273.817  1302.381 2221.005     Chile  15497046
 #> 6 10562.330 -1160.651 3612.938  Colombia  41008227
+```
+
+``` r
 
 gapminder::gapminder %>% 
   filter(year == 2002) %>% 
@@ -208,6 +214,9 @@ gapminder::gapminder %>%
 #> 3  0.5868621 -5.635277 3.2410224     Asia   33
 #> 4  0.5595510  5.461472 3.0901936   Europe   30
 #> 5  3.8910939  3.456984 0.7978846  Oceania    2
+```
+
+``` r
 
 gapminder::gapminder %>% 
   filter(year == 2002) %>% 
@@ -246,13 +255,14 @@ StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
 #' @export
 #'
 #' @examples
-geom_circlepack_text <- function(mapping = NULL, data = NULL,
+stat_circlepack_center <- function(mapping = NULL, data = NULL,
+                                 geom = "text",
                            position = "identity", na.rm = FALSE,
                            show.legend = NA,
                            inherit.aes = TRUE, ...) {
   ggplot2::layer(
+    geom = geom, # inherit other behavior
     stat = StatCirclepackcenter, # proto object from Step 2
-    geom = ggplot2::GeomText, # inherit other behavior
     data = data,
     mapping = mapping,
     position = position,
@@ -261,6 +271,23 @@ geom_circlepack_text <- function(mapping = NULL, data = NULL,
     params = list(na.rm = na.rm, ...)
   )
 }
+
+
+#' Title
+#'
+#' @param mapping
+#' @param data
+#' @param position
+#' @param na.rm
+#' @param show.legend
+#' @param inherit.aes
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+geom_circlepack_text <- stat_circlepack_center
 ```
 
 ### Step 4. test geom
@@ -561,10 +588,19 @@ filter(year == 2002) %>%
 ``` r
 knitrExtra:::chunk_to_r(chunk_name = "compute_panel_circlepack")
 #> It seems you are currently knitting a Rmd/Qmd file. The parsing of the file will be done in a new R session.
+```
+
+``` r
 knitrExtra:::chunk_to_r(chunk_name = "geom_circlepack")
 #> It seems you are currently knitting a Rmd/Qmd file. The parsing of the file will be done in a new R session.
+```
+
+``` r
 knitrExtra:::chunk_to_r(chunk_name = "compute_panel_circlepack_center")
 #> It seems you are currently knitting a Rmd/Qmd file. The parsing of the file will be done in a new R session.
+```
+
+``` r
 knitrExtra:::chunk_to_r(chunk_name = "geom_circlepack_text")
 #> It seems you are currently knitting a Rmd/Qmd file. The parsing of the file will be done in a new R session.
 ```
@@ -617,6 +653,9 @@ layer_data(i = 2)
 #> 1 4.535534  2201   all     1 all -26.46885 0 26.46885 2201 gray50     0   0.5
 #>   vjust alpha family fontface lineheight
 #> 1   0.5    NA               1        1.2
+```
+
+``` r
 
 
 last_plot() +
