@@ -4,28 +4,44 @@
 #' @export
 #'
 #' @examples
-compute_panel_circlepack_center <- function(data, scales){
+compute_panel_circlepack_center <- function(data, scales, fun = sum){
 
   # get aes names as they appear in the data
-  data_mapped_aes_names <- names(data)[names(data) %in% 
-                                         c("id", "fill", "alpha", 
-                                             "colour", "group", "linewidth", "label",
-                                             "linetype", "render")]
+  
+  if(is.null(data$slice)){data$slice <- TRUE}
+
+  data %>% 
+    dplyr::filter(.data$slice) ->
+  data
+  
+  grp_cols <-  c("id", "fill", "alpha", 
+                 "colour", "group", "linewidth", "label",
+                 "linetype", "render")
+  
+  # Thanks June! https://github.com/teunbrand/ggplot-extension-club/discussions/15
+  data %>% 
+    group_by(group_by(pick(any_of(grp_cols)))) ->   
+  data
   
   if(is.null(data$area)){data$area <- 1}
-  data$value <- data$area
+  if(is.null(data$wt)){data$wt <- 1}
   
   data %>% 
-    group_by(across(data_mapped_aes_names)) ->
+    summarize(area = fun(.data$area*.data$wt), .groups = 'drop') ->
+  data
+    
+  data %>%   
+    arrange(id)  -> # this doesn't feel very principled; motivation is when you go from no fill to color, preserves circle position...
   data
   
-  data %>% 
-    count(wt = area) %>% 
-    # ungroup() %>%
-    arrange(id) %>% # this doesn't feel very principled; motivation is when you go from no fill to color, preserves circle position...
-    rename(area = n) ->
-  data
+  if(is.null(data$within)){data$within <- 1}
 
+  data %>%   
+    group_by(.data$within) %>% 
+    mutate(prop = .data$area/sum(.data$area)) %>%
+    mutate(percent = round(.data$prop*100)) -> 
+  data
+  
   data %>%
     pull(area) %>%
     packcircles::circleProgressiveLayout(
@@ -33,17 +49,11 @@ compute_panel_circlepack_center <- function(data, scales){
     cbind(data) ->
   data
   
+  
   if(!is.null(data$render)){
     
     data %>% 
-      mutate(auto_label = ifelse(.data$render, 
-                                 as.character(.data$id), NA)) ->
-    data
-    
-  }else{
-    
-    data %>% 
-      mutate(auto_label = id) ->
+      filter(.data$render) ->
     data
     
   }

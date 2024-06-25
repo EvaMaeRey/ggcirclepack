@@ -4,7 +4,7 @@ StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
                                   compute_panel = compute_panel_circlepack_center,
                                   default_aes = ggplot2::aes(group = after_stat(id),
                                                              size = after_stat(area),
-                                                             label = after_stat(auto_label))
+                                                             label = after_stat(id))
                                   )
 
 

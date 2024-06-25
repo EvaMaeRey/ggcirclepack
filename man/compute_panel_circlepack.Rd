@@ -4,7 +4,7 @@
 \alias{compute_panel_circlepack}
 \title{compute_panel_circlepack}
 \usage{
-compute_panel_circlepack(data, scales, npoints = 50)
+compute_panel_circlepack(data, scales, npoints = 50, fun = sum)
 }
 \arguments{
 \item{scales}{}

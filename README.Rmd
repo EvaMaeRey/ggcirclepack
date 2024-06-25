@@ -101,28 +101,44 @@ filter(year == 2002) %>%
 #' @export
 #'
 #' @examples
-compute_panel_circlepack_center <- function(data, scales){
+compute_panel_circlepack_center <- function(data, scales, fun = sum){
 
   # get aes names as they appear in the data
-  data_mapped_aes_names <- names(data)[names(data) %in% 
-                                         c("id", "fill", "alpha", 
-                                             "colour", "group", "linewidth", "label",
-                                             "linetype", "render")]
+  
+  if(is.null(data$slice)){data$slice <- TRUE}
+
+  data %>% 
+    dplyr::filter(.data$slice) ->
+  data
+  
+  grp_cols <-  c("id", "fill", "alpha", 
+                 "colour", "group", "linewidth", "label",
+                 "linetype", "render")
+  
+  # Thanks June! https://github.com/teunbrand/ggplot-extension-club/discussions/15
+  data %>% 
+    group_by(group_by(pick(any_of(grp_cols)))) ->   
+  data
   
   if(is.null(data$area)){data$area <- 1}
-  data$value <- data$area
+  if(is.null(data$wt)){data$wt <- 1}
   
   data %>% 
-    group_by(across(data_mapped_aes_names)) ->
+    summarize(area = fun(.data$area*.data$wt), .groups = 'drop') ->
+  data
+    
+  data %>%   
+    arrange(id)  -> # this doesn't feel very principled; motivation is when you go from no fill to color, preserves circle position...
   data
   
-  data %>% 
-    count(wt = area) %>% 
-    # ungroup() %>%
-    arrange(id) %>% # this doesn't feel very principled; motivation is when you go from no fill to color, preserves circle position...
-    rename(area = n) ->
-  data
+  if(is.null(data$within)){data$within <- 1}
 
+  data %>%   
+    group_by(.data$within) %>% 
+    mutate(prop = .data$area/sum(.data$area)) %>%
+    mutate(percent = round(.data$prop*100)) -> 
+  data
+  
   data %>%
     pull(area) %>%
     packcircles::circleProgressiveLayout(
@@ -130,16 +146,11 @@ compute_panel_circlepack_center <- function(data, scales){
     cbind(data) ->
   data
   
+  
   if(!is.null(data$render)){
     
     data %>% 
-      mutate(auto_label = ifelse(.data$render, as.character(.data$id), NA)) ->
-    data
-    
-  }else{
-    
-    data %>% 
-      mutate(auto_label = id) ->
+      filter(.data$render) ->
     data
     
   }
@@ -171,6 +182,14 @@ gapminder::gapminder %>%
   select(id = continent, render) %>% 
   compute_panel_circlepack_center()
 
+gapminder::gapminder %>% 
+  # filter(year == 2002) %>% 
+  mutate( render = country == "Argentina") %>% 
+  select(id = continent, render, area = pop) %>% 
+  compute_panel_circlepack_center(fun = mean)
+
+
+
 ```
 
 ### Step 2 and 3 ggproto and geom
@@ -182,7 +201,7 @@ StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
                                   compute_panel = compute_panel_circlepack_center,
                                   default_aes = ggplot2::aes(group = after_stat(id),
                                                              size = after_stat(area),
-                                                             label = after_stat(auto_label))
+                                                             label = after_stat(id))
                                   )
 
 
@@ -271,23 +290,42 @@ last_plot() +
 #' @export
 #'
 #' @examples
-compute_panel_circlepack <- function(data, scales, npoints = 50){
+compute_panel_circlepack <- function(data, scales, npoints = 50, fun = sum){
 
-  data_mapped_aes_names <- names(data)[names(data) %in% c("id", "fill", "alpha", "label",
-                                             "colour", "group", "linewidth", 
-                                             "linetype")]
+  # get aes names as they appear in the data
+  
+  if(is.null(data$slice)){data$slice <- TRUE}
+
+  data %>% 
+    dplyr::filter(.data$slice) ->
+  data
+  
+  grp_cols <-  c("id", "fill", "alpha", 
+                 "colour", "group", "linewidth", "label",
+                 "linetype", "render")
+  
+  # Thanks June! https://github.com/teunbrand/ggplot-extension-club/discussions/15
+  data %>% 
+    group_by(group_by(pick(any_of(grp_cols)))) ->   
+  data
   
   if(is.null(data$area)){data$area <- 1}
+  if(is.null(data$wt)){data$wt <- 1}
   
   data %>% 
-    group_by(across(data_mapped_aes_names)) ->
-  data 
+    summarize(area = fun(.data$area*.data$wt), .groups = 'drop') ->
+  data
+    
+  data %>%   
+    arrange(id)  -> # this doesn't feel very principled; motivation is when you go from no fill to color, preserves circle position...
+  data
   
-  data %>% 
-    count(wt = area) %>% 
-    # ungroup() %>%
-    arrange(id) %>%  # this doesn't feel very principled
-    rename(area = n) ->
+  if(is.null(data$within)){data$within <- 1}
+
+  data %>%   
+    group_by(.data$within) %>% 
+    mutate(prop = .data$area/sum(.data$area)) %>%
+    mutate(percent = round(.data$prop*100)) -> 
   data
 
   data$id = 1:nrow(data)
@@ -393,9 +431,41 @@ last_plot() +
 
 last_plot() + 
   aes(area = gdpPercap) + 
-  labs(title = "and per capita GDPs")
+  labs(title = "and per capita GDPs 2002")
+
+last_plot() + 
+  aes(slice = continent == "Europe") + 
+  facet_null() + 
+  aes(fill = after_stat(area)) + 
+  aes(label = paste0(country, "\n$", round(gdpPercap)))
 
 
+gapminder::gapminder %>%
+filter(year == 2002, 
+       continent == "Europe") %>%
+  ggplot() +
+  aes(id = country, area = pop*gdpPercap) +
+  geom_circlepack() + 
+  geom_circlepack_text(vjust = 0, color = "grey75",
+                       lineheight = .7) +
+  aes(label = str_wrap(country, 10)) +
+  coord_equal() + 
+  scale_size(range = c(.5,4.5)) +
+  aes(slice = continent == "Europe") +
+  labs(title = "Percent of European Economy 2002") + 
+  aes(fill = after_stat(area)) + 
+  ggnewscale::new_scale(new_aes = "size") + 
+  geom_circlepack_text(vjust = 1.2, color = "grey65",
+                       aes(label = paste(after_stat(percent),
+                                         "percent"))) +  
+  scale_size(range = c(.5, 3.5)) + 
+  ggstamp::theme_void_fill("whitesmoke") +
+  theme(legend.position = "none") + 
+  coord_equal()
+  
+```
+
+```{r}
 gapminder::gapminder %>%
 filter(year == 2002) %>%
   ggplot() +
@@ -438,6 +508,30 @@ filter(year == 2002) %>%
   aes(fill = continent) + 
   aes(render = pop > 20000000)
 
+prop_by <- function(...) {
+  area <- evalq(area, parent.frame())
+  if (length(list(...)) == 0) {
+    area / sum(area)
+  } else {
+    area / ave(area, ..., FUN = function(x) sum(abs(x)))
+  }
+}
+
+last_plot() +
+    aes(label = after_stat(scales::percent(prop_by("All"), 2)))
+
+last_plot() +
+    aes(label = after_stat(scales::percent(prop_by(fill), 2)))
+
+
+
+
+```
+
+
+```{r}
+
+
 # GeomTextRepel
 gapminder::gapminder %>%
 filter(year == 2002) %>%
@@ -452,6 +546,39 @@ filter(year == 2002) %>%
   aes(fill = continent) + 
   aes(render = pop > 20000000)
 
+
+```
+
+
+
+```{r}
+gapminder::gapminder %>%
+  ggplot() + 
+  aes(id = country, area = pop) + 
+  geom_circlepack(fun = mean) + 
+  geom_circlepack_text(fun = mean) + 
+  aes(label = paste(after_stat(id), "\n",
+                    round(after_stat(area)/ 1000000), "million")) +
+  labs(title = "Average Population - Millions from 1952-2012") + 
+  aes(fill = I("plum2")) + 
+  coord_equal()
+```
+
+
+```{r}
+mpg %>% 
+  ggplot() + 
+  aes(id = cyl, area = hwy) +
+  geom_circlepack(fun = mean) + 
+  geom_circlepack_text(fun = mean, lineheight = .8) + 
+  scale_size(range = c(4,5)) + 
+  labs(title = "Average highway MPG by number of cyl") + 
+  coord_equal() + 
+  aes(label = 
+        after_stat(paste0(id,"cyl\n", 
+                          round(area), "mpg"))) + 
+  aes(fill = after_stat(area)) + 
+  scale_fill_viridis_c(begin = .3, end = .7) 
 ```
 
 
@@ -493,7 +620,6 @@ tidytitanic::tidy_titanic %>%
   labs(title = "Titanic Passengers")
 
 layer_data(i = 2)
-
 
 last_plot() +
   aes(fill = sex) +

@@ -4,7 +4,7 @@
 \alias{compute_panel_circlepack_center}
 \title{compute_panel_circlepack_center}
 \usage{
-compute_panel_circlepack_center(data, scales)
+compute_panel_circlepack_center(data, scales, fun = sum)
 }
 \description{
 compute_panel_circlepack_center
