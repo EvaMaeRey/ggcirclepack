@@ -112,7 +112,8 @@ compute_panel_circlepack_center <- function(data, scales, fun = sum){
   data
   
   grp_cols <-  c("id", "fill", "alpha", 
-                 "colour", "group", "linewidth", "label",
+                 "colour", "group", "linewidth", 
+                 "label", "size",
                  "linetype", "render")
   
   # Thanks June! https://github.com/teunbrand/ggplot-extension-club/discussions/15
@@ -120,7 +121,7 @@ compute_panel_circlepack_center <- function(data, scales, fun = sum){
     group_by(group_by(pick(any_of(grp_cols)))) ->   
   data
   
-  if(is.null(data$area)){data$area <- 1}
+  if(is.null(data$area)){data <- mutate(data, area = 1)}
   if(is.null(data$wt)){data$wt <- 1}
   
   data %>% 
@@ -301,7 +302,7 @@ compute_panel_circlepack <- function(data, scales, npoints = 50, fun = sum){
   data
   
   grp_cols <-  c("id", "fill", "alpha", 
-                 "colour", "group", "linewidth", "label",
+                 "colour", "group", "linewidth", "label", "size",
                  "linetype", "render")
   
   # Thanks June! https://github.com/teunbrand/ggplot-extension-club/discussions/15
@@ -457,11 +458,41 @@ filter(year == 2002,
   ggnewscale::new_scale(new_aes = "size") + 
   geom_circlepack_text(vjust = 1.2, color = "grey65",
                        aes(label = paste(after_stat(percent),
-                                         "percent"))) +  
+                                         "percent"), 
+                           size = stage(after_stat = area,
+                                        after_scale = size*.85))) +
   scale_size(range = c(.5, 3.5)) + 
   ggstamp::theme_void_fill("whitesmoke") +
   theme(legend.position = "none") + 
   coord_equal()
+  
+pride_index <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-06-11/pride_index.csv')
+
+comm_types <- c("large urban city",
+                "medium city",
+                "small city",
+                "small town",
+                "very small town",
+                "rural community")
+
+pride_it <- pride_index %>% 
+  # fix a typo
+  mutate(campus_location = str_replace(campus_location, "Swarrthmore", "Swarthmore")) %>% 
+  mutate(community_type = fct_relevel(community_type, comm_types)) %>% 
+  mutate(state = str_sub(campus_location, -2, -1)) %>% 
+  mutate(campus_name = str_replace(campus_name, "University", "U"))
+
+ggplot(pride_it) +
+  aes(id = campus_name) + 
+  aes(area = students) + 
+  aes(fill = rating == 5) +
+  geom_circlepack(linewidth = 0.2, color = "grey99") +
+  aes(label = str_wrap(after_stat(id), 10)) +
+  stat_circlepack_center(geom = GeomText, 
+                         lineheight = .8) +
+  scale_size(range = c(0,2)) +
+  aes(size = students*as.numeric(rating == 5)) + # freshly working
+  facet_wrap(facets = vars(community_type))
   
 ```
 

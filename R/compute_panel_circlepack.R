@@ -19,7 +19,7 @@ compute_panel_circlepack <- function(data, scales, npoints = 50, fun = sum){
   data
   
   grp_cols <-  c("id", "fill", "alpha", 
-                 "colour", "group", "linewidth", "label",
+                 "colour", "group", "linewidth", "label", "size",
                  "linetype", "render")
   
   # Thanks June! https://github.com/teunbrand/ggplot-extension-club/discussions/15

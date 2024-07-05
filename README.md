@@ -1,33 +1,31 @@
 
-  - [ggcirclepack](#ggcirclepack)
-      - [Note to the reader](#note-to-the-reader)
-  - [status quo *without* {ggcirclepack}: precomputation required to
-    create two more data
-    frames](#status-quo-without-ggcirclepack-precomputation-required-to-create-two-more-data-frames)
-  - [Proposed UI](#proposed-ui)
-  - [Package functions](#package-functions)
-      - [geom\_circlepack\_text (center)](#geom_circlepack_text-center)
-          - [Step 1. compute panel](#step-1-compute-panel)
-          - [Step 1.1 test compute](#step-11-test-compute)
-          - [Step 2 and 3 ggproto and
-            geom](#step-2-and-3-ggproto-and-geom)
-          - [Step 4. test geom](#step-4-test-geom)
-      - [geom\_circlepack](#geom_circlepack)
-          - [Step 1. compute\_panel](#step-1-compute_panel)
-          - [Step 1.1. test compute](#step-11-test-compute-1)
-          - [Step 2 & 3 ggproto and geom](#step-2--3-ggproto-and-geom)
-          - [Step 4. test geom](#step-4-test-geom-1)
-  - [Package the functions](#package-the-functions)
-  - [Issues](#issues)
-      - [More computation under the hood for a count data
-        case.](#more-computation-under-the-hood-for-a-count-data-case)
+- [ggcirclepack](#ggcirclepack)
+  - [Note to the reader](#note-to-the-reader)
+- [status quo *without* {ggcirclepack}: precomputation required to
+  create two more data
+  frames](#status-quo-without-ggcirclepack-precomputation-required-to-create-two-more-data-frames)
+- [Proposed UI](#proposed-ui)
+- [Package functions](#package-functions)
+  - [geom_circlepack_text (center)](#geom_circlepack_text-center)
+    - [Step 1. compute panel](#step-1-compute-panel)
+    - [Step 1.1 test compute](#step-11-test-compute)
+    - [Step 2 and 3 ggproto and geom](#step-2-and-3-ggproto-and-geom)
+    - [Step 4. test geom](#step-4-test-geom)
+  - [geom_circlepack](#geom_circlepack)
+    - [Step 1. compute_panel](#step-1-compute_panel)
+    - [Step 1.1. test compute](#step-11-test-compute-1)
+    - [Step 2 & 3 ggproto and geom](#step-2--3-ggproto-and-geom)
+    - [Step 4. test geom](#step-4-test-geom-1)
+- [Package the functions](#package-the-functions)
+- [Issues](#issues)
+  - [More computation under the hood for a count data
+    case.](#more-computation-under-the-hood-for-a-count-data-case)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # ggcirclepack
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 circle pack is an experimental package that uses the {packcircles}
@@ -44,13 +42,12 @@ marked with emoji.
 Your help and feedback would be greatly appreciated on any of the
 questions…
 
-  - Are functions named intuitively? *‘According to IBM studies,
-    intuitive variable naming contributes more to code readability than
-    comments, or for that matter, any other factor’ McConnell, S. Code
-    complete*
-  - Do functions work as you expect?
-  - Is there rewriting that could make the code more concise?
-  - What tests should be performed?
+- Are functions named intuitively? *‘According to IBM studies, intuitive
+  variable naming contributes more to code readability than comments, or
+  for that matter, any other factor’ McConnell, S. Code complete*
+- Do functions work as you expect?
+- Is there rewriting that could make the code more concise?
+- What tests should be performed?
 
 # status quo *without* {ggcirclepack}: precomputation required to create two more data frames
 
@@ -118,7 +115,7 @@ filter(year == 2002) %>%
 
 # Package functions
 
-## geom\_circlepack\_text (center)
+## geom_circlepack_text (center)
 
 ### Step 1. compute panel
 
@@ -140,7 +137,8 @@ compute_panel_circlepack_center <- function(data, scales, fun = sum){
   data
   
   grp_cols <-  c("id", "fill", "alpha", 
-                 "colour", "group", "linewidth", "label",
+                 "colour", "group", "linewidth", 
+                 "label", "size",
                  "linetype", "render")
   
   # Thanks June! https://github.com/teunbrand/ggplot-extension-club/discussions/15
@@ -148,7 +146,7 @@ compute_panel_circlepack_center <- function(data, scales, fun = sum){
     group_by(group_by(pick(any_of(grp_cols)))) ->   
   data
   
-  if(is.null(data$area)){data$area <- 1}
+  if(is.null(data$area)){data <- mutate(data, area = 1)}
   if(is.null(data$wt)){data$wt <- 1}
   
   data %>% 
@@ -346,9 +344,9 @@ last_plot() +
 
 <img src="man/figures/README-unnamed-chunk-4-2.png" width="100%" />
 
-## geom\_circlepack
+## geom_circlepack
 
-### Step 1. compute\_panel
+### Step 1. compute_panel
 
 ``` r
 # Step 1
@@ -372,7 +370,7 @@ compute_panel_circlepack <- function(data, scales, npoints = 50, fun = sum){
   data
   
   grp_cols <-  c("id", "fill", "alpha", 
-                 "colour", "group", "linewidth", "label",
+                 "colour", "group", "linewidth", "label", "size",
                  "linetype", "render")
   
   # Thanks June! https://github.com/teunbrand/ggplot-extension-club/discussions/15
@@ -722,7 +720,9 @@ filter(year == 2002,
   ggnewscale::new_scale(new_aes = "size") + 
   geom_circlepack_text(vjust = 1.2, color = "grey65",
                        aes(label = paste(after_stat(percent),
-                                         "percent"))) +  
+                                         "percent"), 
+                           size = stage(after_stat = area,
+                                        after_scale = size*.85))) +
   scale_size(range = c(.5, 3.5)) + 
   ggstamp::theme_void_fill("whitesmoke") +
   theme(legend.position = "none") + 
@@ -738,6 +738,79 @@ filter(year == 2002,
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-9.png" width="100%" />
+
+``` r
+  
+pride_index <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-06-11/pride_index.csv')
+#> Rows: 238 Columns: 5
+#> ── Column specification ────────────────────────────────────────────────────────
+#> Delimiter: ","
+#> chr (3): campus_name, campus_location, community_type
+#> dbl (2): rating, students
+#> 
+#> ℹ Use `spec()` to retrieve the full column specification for this data.
+#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+```
+
+``` r
+
+comm_types <- c("large urban city",
+                "medium city",
+                "small city",
+                "small town",
+                "very small town",
+                "rural community")
+
+pride_it <- pride_index %>% 
+  # fix a typo
+  mutate(campus_location = str_replace(campus_location, "Swarrthmore", "Swarthmore")) %>% 
+  mutate(community_type = fct_relevel(community_type, comm_types)) %>% 
+  mutate(state = str_sub(campus_location, -2, -1)) %>% 
+  mutate(campus_name = str_replace(campus_name, "University", "U"))
+
+ggplot(pride_it) +
+  aes(id = campus_name) + 
+  aes(area = students) + 
+  aes(fill = rating == 5) +
+  geom_circlepack(linewidth = 0.2, color = "grey99") +
+  aes(label = str_wrap(after_stat(id), 10)) +
+  stat_circlepack_center(geom = GeomText, 
+                         lineheight = .8) +
+  scale_size(range = c(0,2)) +
+  aes(size = students*as.numeric(rating == 5)) + # freshly working
+  facet_wrap(facets = vars(community_type))
+#> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+#> ℹ Please use `linewidth` instead.
+#> This warning is displayed once every 8 hours.
+#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+#> generated.
+#> Warning: Unknown or uninitialised column: `wt`.
+#> Warning: Unknown or uninitialised column: `within`.
+#> Warning: Unknown or uninitialised column: `wt`.
+#> Warning: Unknown or uninitialised column: `within`.
+#> Warning: Unknown or uninitialised column: `wt`.
+#> Warning: Unknown or uninitialised column: `within`.
+#> Warning: Unknown or uninitialised column: `wt`.
+#> Warning: Unknown or uninitialised column: `within`.
+#> Warning: Unknown or uninitialised column: `wt`.
+#> Warning: Unknown or uninitialised column: `within`.
+#> Warning: Unknown or uninitialised column: `wt`.
+#> Warning: Unknown or uninitialised column: `within`.
+#> Warning: Unknown or uninitialised column: `wt`.
+#> Warning: Unknown or uninitialised column: `within`.
+#> Warning: Unknown or uninitialised column: `wt`.
+#> Warning: Unknown or uninitialised column: `within`.
+#> Warning: Unknown or uninitialised column: `wt`.
+#> Warning: Unknown or uninitialised column: `within`.
+#> Warning: Unknown or uninitialised column: `wt`.
+#> Warning: Unknown or uninitialised column: `within`.
+#> Warning: Unknown or uninitialised column: `wt`.
+#> Warning: Unknown or uninitialised column: `within`.
+#> Warning: Unknown or uninitialised column: `wt`.
+#> Warning: Unknown or uninitialised column: `within`.
+```
+
+<img src="man/figures/README-unnamed-chunk-6-10.png" width="100%" />
 
 ``` r
 gapminder::gapminder %>%

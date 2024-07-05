@@ -15,7 +15,8 @@ compute_panel_circlepack_center <- function(data, scales, fun = sum){
   data
   
   grp_cols <-  c("id", "fill", "alpha", 
-                 "colour", "group", "linewidth", "label",
+                 "colour", "group", "linewidth", 
+                 "label", "size",
                  "linetype", "render")
   
   # Thanks June! https://github.com/teunbrand/ggplot-extension-club/discussions/15
@@ -23,7 +24,7 @@ compute_panel_circlepack_center <- function(data, scales, fun = sum){
     group_by(group_by(pick(any_of(grp_cols)))) ->   
   data
   
-  if(is.null(data$area)){data$area <- 1}
+  if(is.null(data$area)){data <- mutate(data, area = 1)}
   if(is.null(data$wt)){data$wt <- 1}
   
   data %>% 
