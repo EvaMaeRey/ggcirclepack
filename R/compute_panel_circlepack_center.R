@@ -1,14 +1,6 @@
-#' compute_panel_circlepack_center
-#'
-#' @return
-#' @export
-#'
-#' @examples
-compute_panel_circlepack_center <- function(data, scales, fun = sum){
-
-  # get aes names as they appear in the data
+compute_panel_aggregation <- function(data, scales, fun = sum){
   
-  if(is.null(data$slice)){data$slice <- TRUE}
+    if(is.null(data$slice)){data$slice <- TRUE}
 
   data %>% 
     dplyr::filter(.data$slice) ->
@@ -31,10 +23,6 @@ compute_panel_circlepack_center <- function(data, scales, fun = sum){
     summarize(area = fun(.data$area*.data$wt), .groups = 'drop') ->
   data
     
-  data %>%   
-    arrange(id)  -> # this doesn't feel very principled; motivation is when you go from no fill to color, preserves circle position...
-  data
-  
   if(is.null(data$within)){data$within <- 1}
 
   data %>%   
@@ -42,6 +30,27 @@ compute_panel_circlepack_center <- function(data, scales, fun = sum){
     mutate(prop = .data$area/sum(.data$area)) %>%
     mutate(percent = round(.data$prop*100)) -> 
   data
+  
+  data
+  
+}
+
+#' compute_panel_circlepack_center
+#'
+#' @return
+#' @export
+#'
+#' @examples
+compute_panel_circlepack_center <- function(data, scales, fun = sum){
+
+  # get aes names as they appear in the data
+  
+ data <- data |> compute_panel_aggregation(fun = fun) 
+  
+  
+  data %>%   
+    arrange(id)  -> # this doesn't feel very principled; motivation is when you go from no fill to color, preserves circle position...
+  data  
   
   data %>%
     pull(area) %>%
