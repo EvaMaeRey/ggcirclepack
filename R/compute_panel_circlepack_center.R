@@ -1,15 +1,6 @@
-compute_panel_aggregation <- function(data, scales, fun = sum){
+compute_panel_aggregation <- function(data, scales, fun = sum, non_grouping = c("area", "wt", "within")){
   
-    if(is.null(data$slice)){data$slice <- TRUE}
-
-  data %>% 
-    dplyr::filter(.data$slice) ->
-  data
-  
-  grp_cols <-  c("id", "fill", "alpha", 
-                 "colour", "group", "linewidth", 
-                 "label", "size",
-                 "linetype", "render")
+  grp_cols <-  names(data)[!names(data) %in% non_grouping]
   
   # Thanks June! https://github.com/teunbrand/ggplot-extension-club/discussions/15
   data %>% 

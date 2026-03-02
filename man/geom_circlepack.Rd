@@ -7,11 +7,16 @@
 geom_circlepack(
   mapping = NULL,
   data = NULL,
+  stat = StatCirclepack,
   position = "identity",
+  ...,
+  rule = "evenodd",
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   na.rm = FALSE,
   show.legend = NA,
-  inherit.aes = TRUE,
-  ...
+  inherit.aes = TRUE
 )
 }
 \arguments{

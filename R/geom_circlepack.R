@@ -5,6 +5,13 @@ StatCirclepack <- ggplot2::ggproto(`_class` = "StatCirclepack",
                                   default_aes = ggplot2::aes(group = after_stat(id))
                                   )
 
+GeomPolygonPale <- ggplot2::ggproto(`_class` = "GeomPolygonPale",
+                           `_inherit` = ggplot2::GeomPolygon,
+                           default_aes = modifyList(
+                             ggplot2::GeomPolygon$default_aes,
+                             ggplot2::aes(fill = from_theme(
+                               fill %||% scales::col_mix(ink, paper, 0.8)))))
+
 #' Title
 #'
 #' @param mapping
@@ -19,18 +26,22 @@ StatCirclepack <- ggplot2::ggproto(`_class` = "StatCirclepack",
 #' @export
 #'
 #' @examples
-geom_circlepack <- function(mapping = NULL, data = NULL,
-                           position = "identity", na.rm = FALSE,
-                           show.legend = NA,
-                           inherit.aes = TRUE, ...) {
-  ggplot2::layer(
-    stat = StatCirclepack, # proto object from Step 2
-    geom = ggplot2::GeomPolygon, # inherit other behavior
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, ...)
-  )
-}
+stat_circlepack <- ggplot2::make_constructor(StatCirclepack, geom = GeomPolygonPale)
+
+
+
+#' Title
+#'
+#' @param mapping
+#' @param data
+#' @param position
+#' @param na.rm
+#' @param show.legend
+#' @param inherit.aes
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+geom_circlepack <- ggplot2::make_constructor(GeomPolygonPale, stat = StatCirclepack)

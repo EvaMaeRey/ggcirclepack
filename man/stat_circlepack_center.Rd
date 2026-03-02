@@ -7,12 +7,13 @@
 stat_circlepack_center(
   mapping = NULL,
   data = NULL,
-  geom = "text",
+  geom = ggplot2::GeomText,
   position = "identity",
+  ...,
+  fun = sum,
   na.rm = FALSE,
   show.legend = NA,
-  inherit.aes = TRUE,
-  ...
+  inherit.aes = TRUE
 )
 }
 \arguments{

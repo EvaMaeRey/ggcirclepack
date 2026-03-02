@@ -96,18 +96,9 @@ filter(year == 2002) %>%
 ### Step 1. compute panel
 
 ```{r compute_panel_circlepack_center}
-compute_panel_aggregation <- function(data, scales, fun = sum){
+compute_panel_aggregation <- function(data, scales, fun = sum, non_grouping = c("area", "wt", "within")){
   
-    if(is.null(data$slice)){data$slice <- TRUE}
-
-  data %>% 
-    dplyr::filter(.data$slice) ->
-  data
-  
-  grp_cols <-  c("id", "fill", "alpha", 
-                 "colour", "group", "linewidth", 
-                 "label", "size",
-                 "linetype", "render")
+  grp_cols <-  names(data)[!names(data) %in% non_grouping]
   
   # Thanks June! https://github.com/teunbrand/ggplot-extension-club/discussions/15
   data %>% 
@@ -230,22 +221,7 @@ StatCirclepackcenter <- ggplot2::ggproto(`_class` = "StatCirclepackcenter",
 #' @export
 #'
 #' @examples
-stat_circlepack_center <- function(mapping = NULL, data = NULL,
-                                 geom = "text",
-                           position = "identity", na.rm = FALSE,
-                           show.legend = NA,
-                           inherit.aes = TRUE, ...) {
-  ggplot2::layer(
-    geom = geom, # inherit other behavior
-    stat = StatCirclepackcenter, # proto object from Step 2
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, ...)
-  )
-}
+stat_circlepack_center <- ggplot2::make_constructor(StatCirclepackcenter, geom = ggplot2::GeomText)
 
 
 #' Title
@@ -262,7 +238,7 @@ stat_circlepack_center <- function(mapping = NULL, data = NULL,
 #' @export
 #'
 #' @examples
-geom_circlepack_text <- stat_circlepack_center
+geom_circlepack_text <- ggplot2::make_constructor(ggplot2::GeomText, stat = StatCirclepackcenter)
 
 ```
 
@@ -282,7 +258,8 @@ last_plot() +
   aes(render = pop > 20000000)
 
 
-layer_data()
+layer_data() |> 
+  head()
 ```
 
 
@@ -346,6 +323,13 @@ StatCirclepack <- ggplot2::ggproto(`_class` = "StatCirclepack",
                                   default_aes = ggplot2::aes(group = after_stat(id))
                                   )
 
+GeomPolygonPale <- ggplot2::ggproto(`_class` = "GeomPolygonPale",
+                           `_inherit` = ggplot2::GeomPolygon,
+                           default_aes = modifyList(
+                             ggplot2::GeomPolygon$default_aes,
+                             ggplot2::aes(fill = from_theme(
+                               fill %||% scales::col_mix(ink, paper, 0.8)))))
+
 #' Title
 #'
 #' @param mapping
@@ -360,28 +344,30 @@ StatCirclepack <- ggplot2::ggproto(`_class` = "StatCirclepack",
 #' @export
 #'
 #' @examples
-geom_circlepack <- function(mapping = NULL, data = NULL,
-                           position = "identity", na.rm = FALSE,
-                           show.legend = NA,
-                           inherit.aes = TRUE, ...) {
-  ggplot2::layer(
-    stat = StatCirclepack, # proto object from Step 2
-    geom = ggplot2::GeomPolygon, # inherit other behavior
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, ...)
-  )
-}
+stat_circlepack <- ggplot2::make_constructor(StatCirclepack, geom = GeomPolygonPale)
+
+
+
+#' Title
+#'
+#' @param mapping
+#' @param data
+#' @param position
+#' @param na.rm
+#' @param show.legend
+#' @param inherit.aes
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+geom_circlepack <- ggplot2::make_constructor(GeomPolygonPale, stat = StatCirclepack)
 ```
 
 ### Step 4. test geom
 
 ```{r}
-
-
 gapminder::gapminder %>%
 filter(year == 2002) %>%
   ggplot() +
@@ -442,7 +428,6 @@ filter(year == 2002,
                                          "percent"), 
                            size = stage(after_stat = area,
                                         after_scale = size*.85))) +
-  ggstamp::theme_void_fill("whitesmoke") +
   theme(legend.position = "none")
   
 pride_index <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-06-11/pride_index.csv')
@@ -557,6 +542,8 @@ filter(year == 2002) %>%
   aes(render = pop > 20000000)
 
 
+
+
 ```
 
 
@@ -647,3 +634,15 @@ last_plot() +
 
 ```
 
+
+```{r}
+library(tidyverse)
+library(ggcirclepack)
+penguins |> 
+  mutate(id = row_number()) |>
+  remove_missing() |>
+  ggplot() + 
+  aes(area = bill_len, id = id) + 
+  geom_circlepack() + 
+  facet_wrap(~species)
+```

@@ -7,12 +7,15 @@
 geom_circlepack_text(
   mapping = NULL,
   data = NULL,
-  geom = "text",
+  stat = StatCirclepackcenter,
   position = "identity",
+  ...,
+  parse = FALSE,
+  check_overlap = FALSE,
+  size.unit = "mm",
   na.rm = FALSE,
   show.legend = NA,
-  inherit.aes = TRUE,
-  ...
+  inherit.aes = TRUE
 )
 }
 \arguments{
